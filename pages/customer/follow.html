@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户跟进 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .follow-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .follow-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .follow-type-option {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .follow-type-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .follow-type-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.1);
+        }
+        
+        .follow-type-icon {
+            font-size: 24px;
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+        
+        .follow-type-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .content-editor {
+            position: relative;
+            min-height: 120px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: white;
+        }
+        
+        .editor-toolbar {
+            display: flex;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        
+        .editor-btn {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: var(--border-radius-small);
+            transition: background 0.3s ease;
+        }
+        
+        .editor-btn:hover {
+            background: var(--border-color);
+        }
+        
+        .editor-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .editor-content {
+            padding: var(--spacing-md);
+            min-height: 80px;
+        }
+        
+        .attachment-area {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .attachment-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .attachment-icon {
+            font-size: 36px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .attachment-text {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .attachment-hint {
+            font-size: var(--font-size-sm);
+            color: var(--text-hint);
+        }
+        
+        .attachment-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .attachment-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+        
+        .attachment-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .attachment-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--danger-color);
+        }
+        
+        .reminder-settings {
+            background: var(--bg-secondary);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        .reminder-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+        
+        .reminder-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .follow-type-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .reminder-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">客户跟进</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="saveAsDraft()">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <div class="follow-form">
+                    <!-- 客户信息简要展示 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-building text-primary mr-2"></i>
+                            客户信息
+                        </div>
+                        <div class="card-body">
+                            <div class="customer-brief">
+                                <div class="customer-name" id="customerName">上海XX制造有限公司</div>
+                                <div class="customer-contact">联系人：张经理 | 138-0000-1234</div>
+                                <div class="customer-status">状态：意向客户</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 跟进类型选择 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-tags text-warning mr-2"></i>
+                            跟进类型
+                        </div>
+                        <div class="card-body">
+                            <div class="follow-type-grid">
+                                <div class="follow-type-option" data-type="phone" onclick="selectFollowType('phone')">
+                                    <div class="follow-type-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="follow-type-label">电话沟通</div>
+                                </div>
+                                <div class="follow-type-option" data-type="wechat" onclick="selectFollowType('wechat')">
+                                    <div class="follow-type-icon">
+                                        <i class="fab fa-weixin"></i>
+                                    </div>
+                                    <div class="follow-type-label">微信沟通</div>
+                                </div>
+                                <div class="follow-type-option" data-type="visit" onclick="selectFollowType('visit')">
+                                    <div class="follow-type-icon">
+                                        <i class="fas fa-eye"></i>
+                                    </div>
+                                    <div class="follow-type-label">实地带看</div>
+                                </div>
+                                <div class="follow-type-option" data-type="email" onclick="selectFollowType('email')">
+                                    <div class="follow-type-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="follow-type-label">邮件联系</div>
+                                </div>
+                                <div class="follow-type-option" data-type="meeting" onclick="selectFollowType('meeting')">
+                                    <div class="follow-type-icon">
+                                        <i class="fas fa-handshake"></i>
+                                    </div>
+                                    <div class="follow-type-label">会面洽谈</div>
+                                </div>
+                                <div class="follow-type-option" data-type="other" onclick="selectFollowType('other')">
+                                    <div class="follow-type-icon">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <div class="follow-type-label">其他方式</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 跟进内容 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-edit text-info mr-2"></i>
+                            跟进内容
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">标题</label>
+                                <input type="text" class="form-control" id="followTitle" placeholder="请输入跟进标题...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">详细内容</label>
+                                <div class="content-editor">
+                                    <div class="editor-toolbar">
+                                        <button class="editor-btn" onclick="formatText('bold')" title="加粗">
+                                            <i class="fas fa-bold"></i>
+                                        </button>
+                                        <button class="editor-btn" onclick="formatText('italic')" title="斜体">
+                                            <i class="fas fa-italic"></i>
+                                        </button>
+                                        <button class="editor-btn" onclick="formatText('underline')" title="下划线">
+                                            <i class="fas fa-underline"></i>
+                                        </button>
+                                        <button class="editor-btn" onclick="insertList()" title="插入列表">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                    </div>
+                                    <div class="editor-content" contenteditable="true" id="followContent" 
+                                         placeholder="请详细描述本次跟进的情况、客户反馈、下一步计划等..."></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-paperclip text-success mr-2"></i>
+                            附件资料
+                        </div>
+                        <div class="card-body">
+                            <div class="attachment-area" onclick="selectFiles()">
+                                <div class="attachment-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="attachment-text">点击上传图片、文档或语音</div>
+                                <div class="attachment-hint">支持 JPG、PNG、PDF、MP3、MP4 格式，最大 10MB</div>
+                            </div>
+                            <input type="file" id="fileInput" multiple accept="image/*,audio/*,video/*,.pdf,.doc,.docx" style="display: none;">
+                            <div class="attachment-preview" id="attachmentPreview"></div>
+                        </div>
+                    </div>
+
+                    <!-- 提醒设置 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-bell text-purple mr-2"></i>
+                            提醒设置
+                        </div>
+                        <div class="card-body">
+                            <div class="reminder-settings">
+                                <div class="reminder-toggle">
+                                    <div class="toggle-switch" id="reminderToggle" onclick="toggleReminder()">
+                                        <div class="toggle-slider"></div>
+                                    </div>
+                                    <label>设置下次跟进提醒</label>
+                                </div>
+                                
+                                <div class="reminder-options" id="reminderOptions" style="display: none;">
+                                    <div class="form-group">
+                                        <label class="form-label">提醒时间</label>
+                                        <input type="datetime-local" class="form-control" id="reminderTime">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">提醒方式</label>
+                                        <select class="form-control" id="reminderMethod">
+                                            <option value="system">系统通知</option>
+                                            <option value="email">邮件提醒</option>
+                                            <option value="sms">短信提醒</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 快捷操作 -->
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="saveAsDraft()">
+                            <i class="fas fa-save mr-2"></i>
+                            保存草稿
+                        </button>
+                        <button class="action-btn primary" onclick="submitFollow()">
+                            <i class="fas fa-check mr-2"></i>
+                            完成跟进
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="../promotion/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let selectedFollowType = null;
+        let attachments = [];
+        let customerId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            customerId = getUrlParameter('id') || 'demo-customer-001';
+            loadCustomerInfo();
+            
+            // 初始化文件上传
+            const fileInput = document.getElementById('fileInput');
+            fileInput.addEventListener('change', handleFileSelect);
+        });
+
+        async function loadCustomerInfo() {
+            // 模拟加载客户信息
+            const customerInfo = {
+                name: '上海XX制造有限公司',
+                contact: '张经理',
+                phone: '138-0000-1234',
+                status: '意向客户'
+            };
+            
+            document.getElementById('customerName').textContent = customerInfo.name;
+            document.querySelector('.customer-contact').textContent = 
+                `联系人：${customerInfo.contact} | ${customerInfo.phone}`;
+            document.querySelector('.customer-status').textContent = 
+                `状态：${customerInfo.status}`;
+        }
+
+        function selectFollowType(type) {
+            // 清除之前的选择
+            document.querySelectorAll('.follow-type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 选择当前类型
+            document.querySelector(`[data-type="${type}"]`).classList.add('selected');
+            selectedFollowType = type;
+            
+            // 根据类型自动填充标题
+            const titles = {
+                phone: '电话沟通',
+                wechat: '微信交流',
+                visit: '实地带看',
+                email: '邮件往来',
+                meeting: '会面洽谈',
+                other: '其他跟进'
+            };
+            
+            document.getElementById('followTitle').value = titles[type] || '';
+        }
+
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('followContent').focus();
+        }
+
+        function insertList() {
+            document.execCommand('insertUnorderedList', false, null);
+            document.getElementById('followContent').focus();
+        }
+
+        function selectFiles() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) {
+                    Utils.showToast('文件大小不能超过10MB', 'warning');
+                    return;
+                }
+                
+                const attachment = {
+                    id: Date.now() + Math.random(),
+                    file: file,
+                    name: file.name,
+                    type: file.type,
+                    size: file.size
+                };
+                
+                attachments.push(attachment);
+                renderAttachment(attachment);
+            });
+        }
+
+        function renderAttachment(attachment) {
+            const preview = document.getElementById('attachmentPreview');
+            const item = document.createElement('div');
+            item.className = 'attachment-item';
+            item.dataset.id = attachment.id;
+            
+            if (attachment.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(attachment.file);
+                item.appendChild(img);
+            } else {
+                // 非图片文件显示图标
+                const icon = document.createElement('div');
+                icon.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    font-size: 24px;
+                    color: var(--text-secondary);
+                `;
+                
+                let iconClass = 'fas fa-file';
+                if (attachment.type.includes('audio')) iconClass = 'fas fa-music';
+                if (attachment.type.includes('video')) iconClass = 'fas fa-video';
+                if (attachment.type.includes('pdf')) iconClass = 'fas fa-file-pdf';
+                if (attachment.type.includes('word')) iconClass = 'fas fa-file-word';
+                
+                icon.innerHTML = `<i class="${iconClass}"></i>`;
+                item.appendChild(icon);
+            }
+            
+            // 添加删除按钮
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'attachment-remove';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = () => removeAttachment(attachment.id);
+            item.appendChild(removeBtn);
+            
+            preview.appendChild(item);
+        }
+
+        function removeAttachment(id) {
+            attachments = attachments.filter(att => att.id !== id);
+            const item = document.querySelector(`[data-id="${id}"]`);
+            if (item) item.remove();
+        }
+
+        function toggleReminder() {
+            const toggle = document.getElementById('reminderToggle');
+            const options = document.getElementById('reminderOptions');
+            
+            toggle.classList.toggle('active');
+            
+            if (toggle.classList.contains('active')) {
+                options.style.display = 'grid';
+                // 设置默认提醒时间为明天同一时间
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('reminderTime').value = 
+                    tomorrow.toISOString().slice(0, 16);
+            } else {
+                options.style.display = 'none';
+            }
+        }
+
+        function saveAsDraft() {
+            const data = collectFormData();
+            data.status = 'draft';
+            
+            // 模拟保存草稿
+            Utils.showToast('草稿已保存', 'success');
+        }
+
+        function submitFollow() {
+            if (!selectedFollowType) {
+                Utils.showToast('请选择跟进类型', 'warning');
+                return;
+            }
+            
+            const title = document.getElementById('followTitle').value.trim();
+            if (!title) {
+                Utils.showToast('请输入跟进标题', 'warning');
+                return;
+            }
+            
+            const content = document.getElementById('followContent').innerHTML.trim();
+            if (!content || content === '<br>') {
+                Utils.showToast('请输入跟进内容', 'warning');
+                return;
+            }
+            
+            const data = collectFormData();
+            data.status = 'completed';
+            
+            // 模拟提交
+            Utils.showToast('跟进记录已保存', 'success');
+            
+            // 延迟跳转回客户详情页
+            setTimeout(() => {
+                Navigation.goto(`detail.html?id=${customerId}`);
+            }, 1500);
+        }
+
+        function collectFormData() {
+            return {
+                customerId,
+                type: selectedFollowType,
+                title: document.getElementById('followTitle').value,
+                content: document.getElementById('followContent').innerHTML,
+                attachments: attachments.map(att => ({
+                    name: att.name,
+                    type: att.type,
+                    size: att.size
+                })),
+                reminder: {
+                    enabled: document.getElementById('reminderToggle').classList.contains('active'),
+                    time: document.getElementById('reminderTime').value,
+                    method: document.getElementById('reminderMethod').value
+                },
+                createTime: new Date().toISOString()
+            };
+        }
+
+        function getUrlParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+    </script>
+</body>
+</html>

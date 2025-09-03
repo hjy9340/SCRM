@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增客户 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="../../assets/js/avatar-samples.js"></script>
+    <style>
+        .form-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+            padding: 0 var(--spacing-md);
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+        
+        .step:last-child::before {
+            display: none;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-xs);
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active .step-number {
+            background: var(--primary-color);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success-color);
+        }
+        
+        .step.completed::before {
+            background: var(--success-color);
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .step.active .step-label {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .avatar-upload {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-sm);
+            border: 3px solid var(--border-color);
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background: var(--bg-secondary);
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-size: 24px;
+        }
+        
+        /* 头像示例选择器样式 */
+        .avatar-samples {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            z-index: 1000;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+        
+        .avatar-samples-container {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .avatar-samples-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .avatar-samples-title {
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+        }
+        
+        .avatar-samples-search {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        
+        .avatar-samples-search input {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        
+        .avatar-samples-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+        
+        .avatar-sample-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            padding: var(--spacing-xs);
+            border-radius: var(--border-radius);
+            transition: all 0.2s ease;
+        }
+        
+        .avatar-sample-item:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .avatar-sample-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: var(--spacing-xs);
+            border: 2px solid transparent;
+        }
+        
+        .avatar-sample-item.selected img {
+            border-color: var(--primary-color);
+        }
+        
+        .avatar-sample-item .name {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        .avatar-sample-item .tags {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        .avatar-samples-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            background: var(--bg-secondary);
+        }
+        
+        .avatar-samples-tab {
+            padding: var(--spacing-sm) var(--spacing-md);
+            white-space: nowrap;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .avatar-samples-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .avatar-samples-footer {
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+        
+        @media (max-width: 576px) {
+            .avatar-samples-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .tag-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            min-height: 42px;
+        }
+        
+        .tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tag-add {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">新增客户</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="saveDraft()">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <!-- 步骤指示器 -->
+                <div class="form-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">基本信息</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">需求信息</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">客户分类</div>
+                    </div>
+                </div>
+
+                <!-- 表单内容 -->
+                <div class="form-container">
+                    <!-- 第一步：基本信息 -->
+                    <div class="form-step active" data-step="1">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-user text-primary mr-2"></i>
+                                基本信息
+                            </div>
+                            <div class="card-body">
+                                <!-- 头像上传 -->
+                                <div class="avatar-upload">
+                                    <div class="avatar-preview" onclick="selectAvatar()">
+                                        <div class="avatar-placeholder">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                                    <div class="text-sm text-secondary">点击上传头像或<a href="javascript:void(0)" onclick="showAvatarSamples()">选择示例</a></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">公司名称</label>
+                                    <input type="text" class="form-control" id="companyName" placeholder="请输入公司名称">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label required">联系人</label>
+                                        <input type="text" class="form-control" id="contactName" placeholder="请输入联系人姓名">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">职务</label>
+                                        <input type="text" class="form-control" id="position" placeholder="请输入职务">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label required">联系电话</label>
+                                    <input type="tel" class="form-control" id="phone" placeholder="请输入手机号码">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">微信号</label>
+                                    <input type="text" class="form-control" id="wechat" placeholder="请输入微信号">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">邮箱</label>
+                                    <input type="email" class="form-control" id="email" placeholder="请输入邮箱地址">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">公司地址</label>
+                                    <input type="text" class="form-control" id="address" placeholder="请输入公司地址">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">行业类型</label>
+                                    <select class="form-control" id="industry">
+                                        <option value="">请选择行业类型</option>
+                                        <option value="制造业">制造业</option>
+                                        <option value="电子信息">电子信息</option>
+                                        <option value="生物医药">生物医药</option>
+                                        <option value="新材料">新材料</option>
+                                        <option value="汽车工业">汽车工业</option>
+                                        <option value="食品加工">食品加工</option>
+                                        <option value="纺织服装">纺织服装</option>
+                                        <option value="其他">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第二步：需求信息 -->
+                    <div class="form-step" data-step="2">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-list-alt text-warning mr-2"></i>
+                                需求信息
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">预算范围</label>
+                                        <select class="form-control" id="budget">
+                                            <option value="">请选择预算范围</option>
+                                            <option value="50万以下">50万以下</option>
+                                            <option value="50-100万">50-100万</option>
+                                            <option value="100-200万">100-200万</option>
+                                            <option value="200-500万">200-500万</option>
+                                            <option value="500万以上">500万以上</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">需求类型</label>
+                                        <select class="form-control" id="demandType">
+                                            <option value="">请选择需求类型</option>
+                                            <option value="租赁">租赁</option>
+                                            <option value="购买">购买</option>
+                                            <option value="租赁或购买">租赁或购买</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">面积需求(㎡)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="minArea" placeholder="最小面积">
+                                            <span class="input-group-text">-</span>
+                                            <input type="number" class="form-control" id="maxArea" placeholder="最大面积">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">层高要求(米)</label>
+                                        <select class="form-control" id="heightReq">
+                                            <option value="">无特殊要求</option>
+                                            <option value="6米以上">6米以上</option>
+                                            <option value="8米以上">8米以上</option>
+                                            <option value="10米以上">10米以上</option>
+                                            <option value="12米以上">12米以上</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">意向区域</label>
+                                    <div class="checkbox-group">
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="深圳">
+                                            <span>深圳</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="广州">
+                                            <span>广州</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="东莞">
+                                            <span>东莞</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="佛山">
+                                            <span>佛山</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="惠州">
+                                            <span>惠州</span>
+                                        </label>
+                                        <label class="checkbox-item">
+                                            <input type="checkbox" value="中山">
+                                            <span>中山</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">特殊要求</label>
+                                    <textarea class="form-control" id="requirements" rows="3" placeholder="请输入特殊要求，如配套设施、交通条件等"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 第三步：客户分类 -->
+                    <div class="form-step" data-step="3">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-tags text-success mr-2"></i>
+                                客户分类
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">客户等级</label>
+                                    <select class="form-control" id="customerLevel">
+                                        <option value="A">A级 - 重点客户</option>
+                                        <option value="B">B级 - 一般客户</option>
+                                        <option value="C">C级 - 潜在客户</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">客户来源</label>
+                                    <select class="form-control" id="source">
+                                        <option value="">请选择客户来源</option>
+                                        <option value="电话咨询">电话咨询</option>
+                                        <option value="网络推广">网络推广</option>
+                                        <option value="客户介绍">客户介绍</option>
+                                        <option value="展会">展会</option>
+                                        <option value="上门拜访">上门拜访</option>
+                                        <option value="其他">其他</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">客户标签</label>
+                                    <div class="tag-input" id="tagInput">
+                                        <button type="button" class="tag-add" onclick="addTag()">
+                                            <i class="fas fa-plus"></i> 添加标签
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">备注</label>
+                                    <textarea class="form-control" id="notes" rows="4" placeholder="请输入备注信息"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 表单导航 -->
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" onclick="prevStep()" style="display: none;">
+                            <i class="fas fa-arrow-left"></i>
+                            上一步
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                            下一步
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button type="button" class="btn btn-success" id="submitBtn" onclick="submitForm()" style="display: none;">
+                            <i class="fas fa-check"></i>
+                            完成
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon"><i class="fas fa-home"></i></div>
+                    首页
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    客户
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon"><i class="fas fa-building"></i></div>
+                    房源
+                </a>
+                <a href="../promotion/index.html" class="tabbar-item">
+                    <div class="icon"><i class="fas fa-share-alt"></i></div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon"><i class="fas fa-user"></i></div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let currentStep = 1;
+        let customerTags = [];
+        let avatarFile = null;
+        let selectedAvatarSample = null;
+        let currentAvatarCategory = 'common';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('avatarInput').addEventListener('change', handleAvatarUpload);
+            initializeAvatarSamples();
+        });
+
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep < 3) {
+                    currentStep++;
+                    updateSteps();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateSteps();
+            }
+        }
+
+        function updateSteps() {
+            // 更新步骤指示器
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // 更新表单步骤
+            document.querySelectorAll('.form-step').forEach((step, index) => {
+                step.classList.remove('active');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // 更新按钮
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            nextBtn.style.display = currentStep < 3 ? 'block' : 'none';
+            submitBtn.style.display = currentStep === 3 ? 'block' : 'none';
+        }
+
+        function validateCurrentStep() {
+            if (currentStep === 1) {
+                const companyName = document.getElementById('companyName').value.trim();
+                const contactName = document.getElementById('contactName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+
+                if (!companyName) {
+                    Utils.showToast('请输入公司名称', 'warning');
+                    return false;
+                }
+                if (!contactName) {
+                    Utils.showToast('请输入联系人', 'warning');
+                    return false;
+                }
+                if (!phone) {
+                    Utils.showToast('请输入联系电话', 'warning');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function selectAvatar() {
+            document.getElementById('avatarInput').click();
+        }
+
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                avatarFile = file;
+                selectedAvatarSample = null; // 清除已选择的示例头像
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.querySelector('.avatar-preview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="头像预览">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 显示头像示例选择器
+        function showAvatarSamples() {
+            document.getElementById('avatarSamplesModal').style.display = 'block';
+            renderAvatarSamples();
+        }
+
+        // 隐藏头像示例选择器
+        function hideAvatarSamples() {
+            document.getElementById('avatarSamplesModal').style.display = 'none';
+            document.getElementById('avatarSearchInput').value = '';
+        }
+
+        // 初始化头像示例选择器
+        function initializeAvatarSamples() {
+            // 绑定搜索事件
+            document.getElementById('avatarSearchInput').addEventListener('input', function() {
+                renderAvatarSamples();
+            });
+
+            // 绑定分类标签点击事件
+            document.querySelectorAll('.avatar-samples-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.avatar-samples-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentAvatarCategory = this.dataset.category;
+                    renderAvatarSamples();
+                });
+            });
+        }
+
+        // 渲染头像示例
+        function renderAvatarSamples() {
+            const searchKeyword = document.getElementById('avatarSearchInput').value.trim();
+            const grid = document.getElementById('avatarSamplesGrid');
+            
+            let samples = [];
+            
+            if (searchKeyword) {
+                // 搜索所有分类的头像
+                samples = AvatarSamples.search(searchKeyword);
+            } else {
+                // 根据当前分类获取头像
+                if (currentAvatarCategory === 'common') {
+                    samples = AvatarSamples.common;
+                } else {
+                    samples = AvatarSamples.getByIndustry(currentAvatarCategory);
+                }
+            }
+            
+            grid.innerHTML = samples.map((avatar, index) => `
+                <div class="avatar-sample-item ${selectedAvatarSample && selectedAvatarSample.url === avatar.url ? 'selected' : ''}" 
+                     data-index="${index}" 
+                     onclick="selectAvatarSample(${index})">
+                    <img src="${avatar.url}" alt="${avatar.name}">
+                    <div class="name">${avatar.name}</div>
+                    <div class="tags">${avatar.tags.join(', ')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 选择头像示例
+        function selectAvatarSample(index) {
+            const searchKeyword = document.getElementById('avatarSearchInput').value.trim();
+            let samples = [];
+            
+            if (searchKeyword) {
+                samples = AvatarSamples.search(searchKeyword);
+            } else {
+                if (currentAvatarCategory === 'common') {
+                    samples = AvatarSamples.common;
+                } else {
+                    samples = AvatarSamples.getByIndustry(currentAvatarCategory);
+                }
+            }
+            
+            selectedAvatarSample = samples[index];
+            
+            // 更新UI选中状态
+            document.querySelectorAll('.avatar-sample-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        // 确认头像选择
+        function confirmAvatarSelection() {
+            if (selectedAvatarSample) {
+                // 清除已上传的文件
+                avatarFile = null;
+                document.getElementById('avatarInput').value = '';
+                
+                // 更新头像预览
+                const preview = document.querySelector('.avatar-preview');
+                preview.innerHTML = `<img src="${selectedAvatarSample.url}" alt="头像预览">`;
+                
+                // 隐藏选择器
+                hideAvatarSamples();
+                
+                Utils.showToast('头像选择成功', 'success');
+            } else {
+                Utils.showToast('请选择一个头像', 'warning');
+            }
+        }
+
+        function addTag() {
+            const tagName = prompt('请输入标签名称:');
+            if (tagName && tagName.trim()) {
+                const trimmedTag = tagName.trim();
+                if (!customerTags.includes(trimmedTag)) {
+                    customerTags.push(trimmedTag);
+                    renderTags();
+                }
+            }
+        }
+
+        function removeTag(index) {
+            customerTags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderTags() {
+            const tagInput = document.getElementById('tagInput');
+            tagInput.innerHTML = customerTags.map((tag, index) => `
+                <span class="tag">
+                    ${tag}
+                    <button type="button" class="tag-remove" onclick="removeTag(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </span>
+            `).join('') + `
+                <button type="button" class="tag-add" onclick="addTag()">
+                    <i class="fas fa-plus"></i> 添加标签
+                </button>
+            `;
+        }
+
+        function collectFormData() {
+            const areas = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            return {
+                companyName: document.getElementById('companyName').value,
+                contactName: document.getElementById('contactName').value,
+                position: document.getElementById('position').value,
+                phone: document.getElementById('phone').value,
+                wechat: document.getElementById('wechat').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                industry: document.getElementById('industry').value,
+                budget: document.getElementById('budget').value,
+                demandType: document.getElementById('demandType').value,
+                minArea: document.getElementById('minArea').value,
+                maxArea: document.getElementById('maxArea').value,
+                heightReq: document.getElementById('heightReq').value,
+                areas: areas,
+                requirements: document.getElementById('requirements').value,
+                customerLevel: document.getElementById('customerLevel').value,
+                source: document.getElementById('source').value,
+                tags: customerTags,
+                notes: document.getElementById('notes').value,
+                avatar: avatarFile,
+                avatarSample: selectedAvatarSample
+            };
+        }
+
+        function saveDraft() {
+            const data = collectFormData();
+            data.status = 'draft';
+            Utils.showToast('草稿已保存', 'success');
+        }
+
+        function submitForm() {
+            if (!validateCurrentStep()) return;
+
+            const data = collectFormData();
+            data.status = 'completed';
+
+            Utils.showToast('客户信息已保存', 'success');
+            setTimeout(() => {
+                Navigation.goto('index.html');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">系统设置</div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 账户设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-circle text-primary mr-2"></i>
+                        账户设置
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">头像设置</div>
+                                    <div class="menu-desc">更换个人头像</div>
+                                </div>
+                                <div class="menu-action">
+                                    <img src="https://via.placeholder.com/40x40?text=王" class="profile-avatar-small" onclick="changeAvatar()">
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="editProfile()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">个人信息</div>
+                                    <div class="menu-desc">编辑姓名、职位、联系方式</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="changePassword()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-key"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">修改密码</div>
+                                    <div class="menu-desc">修改登录密码</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 通知设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-bell text-warning mr-2"></i>
+                        通知设置
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">推送通知</div>
+                                    <div class="menu-desc">接收系统推送消息</div>
+                                </div>
+                                <div class="menu-toggle">
+                                    <input type="checkbox" id="pushNotifications" checked onchange="togglePushNotifications()">
+                                    <label for="pushNotifications" class="toggle-label"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">邮件通知</div>
+                                    <div class="menu-desc">接收重要邮件提醒</div>
+                                </div>
+                                <div class="menu-toggle">
+                                    <input type="checkbox" id="emailNotifications" onchange="toggleEmailNotifications()">
+                                    <label for="emailNotifications" class="toggle-label"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-sms"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">短信通知</div>
+                                    <div class="menu-desc">接收短信提醒</div>
+                                </div>
+                                <div class="menu-toggle">
+                                    <input type="checkbox" id="smsNotifications" checked onchange="toggleSmsNotifications()">
+                                    <label for="smsNotifications" class="toggle-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 隐私设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-shield-alt text-success mr-2"></i>
+                        隐私设置
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">信息可见性</div>
+                                    <div class="menu-desc">控制个人信息的可见范围</div>
+                                </div>
+                                <div class="menu-action">
+                                    <select class="form-select-mini" onchange="changeVisibility(this.value)">
+                                        <option value="public">公开</option>
+                                        <option value="team" selected>团队可见</option>
+                                        <option value="private">私密</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">联系方式公开</div>
+                                    <div class="menu-desc">允许客户查看联系方式</div>
+                                </div>
+                                <div class="menu-toggle">
+                                    <input type="checkbox" id="contactVisible" checked onchange="toggleContactVisible()">
+                                    <label for="contactVisible" class="toggle-label"></label>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">业绩数据共享</div>
+                                    <div class="menu-desc">与团队共享业绩数据</div>
+                                </div>
+                                <div class="menu-toggle">
+                                    <input type="checkbox" id="dataSharing" onchange="toggleDataSharing()">
+                                    <label for="dataSharing" class="toggle-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 工作设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-briefcase text-info mr-2"></i>
+                        工作设置
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item" onclick="setWorkArea()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">工作区域</div>
+                                    <div class="menu-desc">设置主要工作区域</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="setSpecialty()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">专业领域</div>
+                                    <div class="menu-desc">设置专业从事的地产类型</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="setWorkTime()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">工作时间</div>
+                                    <div class="menu-desc">设置工作时间和可联系时间</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 应用设置 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cog text-secondary mr-2"></i>
+                        应用设置
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">主题模式</div>
+                                    <div class="menu-desc">选择界面主题</div>
+                                </div>
+                                <div class="menu-action">
+                                    <select class="form-select-mini" onchange="changeTheme(this.value)">
+                                        <option value="light" selected>浅色模式</option>
+                                        <option value="dark">深色模式</option>
+                                        <option value="auto">跟随系统</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item">
+                                <div class="menu-icon">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">语言设置</div>
+                                    <div class="menu-desc">选择界面语言</div>
+                                </div>
+                                <div class="menu-action">
+                                    <select class="form-select-mini" onchange="changeLanguage(this.value)">
+                                        <option value="zh-CN" selected>简体中文</option>
+                                        <option value="zh-TW">繁體中文</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="clearCache()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">清除缓存</div>
+                                    <div class="menu-desc">清理应用缓存数据</div>
+                                </div>
+                                <div class="menu-action">
+                                    <span class="text-hint">128MB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 账户操作 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-cog text-danger mr-2"></i>
+                        账户操作
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="menu-list">
+                            <div class="menu-item" onclick="exportData()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">导出数据</div>
+                                    <div class="menu-desc">导出个人数据备份</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="menu-item" onclick="logout()">
+                                <div class="menu-icon">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <div class="menu-content">
+                                    <div class="menu-title">退出登录</div>
+                                    <div class="menu-desc">安全退出当前账户</div>
+                                </div>
+                                <div class="menu-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 自定义样式 -->
+    <style>
+        .profile-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        
+        .menu-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-toggle input[type="checkbox"] {
+            display: none;
+        }
+        
+        .toggle-label {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            background-color: var(--border-color);
+            border-radius: 26px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        input[type="checkbox"]:checked + .toggle-label {
+            background-color: var(--primary-color);
+        }
+        
+        input[type="checkbox"]:checked + .toggle-label::after {
+            transform: translateX(24px);
+        }
+        
+        .form-select-mini {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .menu-action {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        function togglePushNotifications() {
+            const isEnabled = document.getElementById('pushNotifications').checked;
+            showToast(isEnabled ? '推送通知已开启' : '推送通知已关闭', 'success');
+        }
+
+        function toggleEmailNotifications() {
+            const isEnabled = document.getElementById('emailNotifications').checked;
+            showToast(isEnabled ? '邮件通知已开启' : '邮件通知已关闭', 'success');
+        }
+
+        function toggleSmsNotifications() {
+            const isEnabled = document.getElementById('smsNotifications').checked;
+            showToast(isEnabled ? '短信通知已开启' : '短信通知已关闭', 'success');
+        }
+
+        function toggleContactVisible() {
+            const isVisible = document.getElementById('contactVisible').checked;
+            showToast(isVisible ? '联系方式已公开' : '联系方式已隐藏', 'success');
+        }
+
+        function toggleDataSharing() {
+            const isSharing = document.getElementById('dataSharing').checked;
+            showToast(isSharing ? '数据共享已开启' : '数据共享已关闭', 'success');
+        }
+
+        function changeAvatar() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.querySelector('.profile-avatar-small').src = e.target.result;
+                        showToast('头像更新成功', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        function editProfile() {
+            showModal({
+                title: '编辑个人信息',
+                content: `
+                    <div class="form-group">
+                        <label class="form-label">姓名</label>
+                        <input type="text" class="form-input" id="editName" value="王销售">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">职位</label>
+                        <input type="text" class="form-input" id="editTitle" value="高级顾问">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">联系电话</label>
+                        <input type="tel" class="form-input" id="editPhone" value="138-1234-5678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" class="form-input" id="editEmail" value="wang@company.com">
+                    </div>
+                `,
+                buttons: [
+                    { text: '取消', type: 'secondary' },
+                    { text: '保存', type: 'primary', onclick: saveProfile }
+                ]
+            });
+        }
+
+        function saveProfile() {
+            showToast('个人信息保存成功', 'success');
+            hideModal();
+        }
+
+        function changePassword() {
+            showModal({
+                title: '修改密码',
+                content: `
+                    <div class="form-group">
+                        <label class="form-label">当前密码</label>
+                        <input type="password" class="form-input" id="currentPassword">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">新密码</label>
+                        <input type="password" class="form-input" id="newPassword">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">确认新密码</label>
+                        <input type="password" class="form-input" id="confirmPassword">
+                    </div>
+                `,
+                buttons: [
+                    { text: '取消', type: 'secondary' },
+                    { text: '修改', type: 'primary', onclick: updatePassword }
+                ]
+            });
+        }
+
+        function updatePassword() {
+            showToast('密码修改成功', 'success');
+            hideModal();
+        }
+
+        function changeVisibility(value) {
+            const texts = {
+                public: '公开可见',
+                team: '团队可见',
+                private: '仅自己可见'
+            };
+            showToast(`信息可见性已设置为：${texts[value]}`, 'success');
+        }
+
+        function changeTheme(value) {
+            const texts = {
+                light: '浅色模式',
+                dark: '深色模式',
+                auto: '跟随系统'
+            };
+            showToast(`主题已切换为：${texts[value]}`, 'success');
+        }
+
+        function changeLanguage(value) {
+            const texts = {
+                'zh-CN': '简体中文',
+                'zh-TW': '繁體中文',
+                'en': 'English'
+            };
+            showToast(`语言已切换为：${texts[value]}`, 'success');
+        }
+
+        function setWorkArea() {
+            showToast('工作区域设置功能开发中', 'info');
+        }
+
+        function setSpecialty() {
+            showToast('专业领域设置功能开发中', 'info');
+        }
+
+        function setWorkTime() {
+            showToast('工作时间设置功能开发中', 'info');
+        }
+
+        function clearCache() {
+            if (confirm('确定要清除缓存吗？这将清理所有本地数据。')) {
+                showToast('缓存清理完成', 'success');
+            }
+        }
+
+        function exportData() {
+            showToast('数据导出功能开发中', 'info');
+        }
+
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                showToast('正在退出...', 'info');
+                setTimeout(() => {
+                    window.location.href = '../../index.html';
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

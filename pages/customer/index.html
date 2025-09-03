@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户管理 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .customer-card {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+        
+        .customer-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .customer-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .customer-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .customer-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-xs);
+            margin: var(--spacing-sm) 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .detail-item i {
+            width: 14px;
+            font-size: 12px;
+        }
+        
+        .customer-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: var(--spacing-sm) 0;
+        }
+        
+        .customer-level {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .level-a {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .level-b {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .level-c {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .customer-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">客户管理</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="showSearchModal()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="navbar-action" onclick="showFilterModal()">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 搜索栏 -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="🔍 输入客户名称..." id="searchInput" onInput="handleSearch(this.value)">
+                <button class="search-filter" onclick="showFilterModal()">
+                    筛选 <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <!-- 筛选标签栏 -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-status="all" onclick="filterByStatus('all')">全部</button>
+                <button class="filter-tab" data-status="intent" onclick="filterByStatus('intent')">意向</button>
+                <button class="filter-tab" data-status="viewing" onclick="filterByStatus('viewing')">带看</button>
+                <button class="filter-tab" data-status="deal" onclick="filterByStatus('deal')">成交</button>
+                <button class="filter-tab" data-status="follow" onclick="filterByStatus('follow')">跟进中</button>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 客户统计 -->
+                <div class="stats-cards" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 16px;">
+                    <div class="stats-card">
+                        <div class="number" id="totalCustomers">0</div>
+                        <div class="label">总客户</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="number" id="intentCustomers">0</div>
+                        <div class="label">意向</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="number" id="viewingCustomers">0</div>
+                        <div class="label">带看</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="number" id="dealCustomers">0</div>
+                        <div class="label">成交</div>
+                    </div>
+                </div>
+
+                <!-- 客户列表 -->
+                <div id="customerList" class="customer-list">
+                    <!-- 客户卡片将通过JavaScript动态生成 -->
+                </div>
+
+                <!-- 空状态 -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="title">暂无客户数据</div>
+                    <div class="description">点击下方按钮添加第一个客户</div>
+                    <button class="btn btn-primary" onclick="Navigation.goto('add.html')">
+                        <i class="fas fa-plus"></i>
+                        添加客户
+                    </button>
+                </div>
+
+                <!-- 加载状态 -->
+                <div id="loadingState" class="text-center p-4">
+                    <div class="spinner" style="margin: 0 auto 16px;"></div>
+                    <div class="text-secondary">加载客户数据中...</div>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                    <span class="badge" id="customerBadge">0</span>
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="../promotion/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <button class="fab" onclick="Navigation.goto('add.html')">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- 搜索模态框 -->
+    <div id="searchModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">搜索客户</h3>
+                <button class="modal-close" onclick="hideSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">客户名称</label>
+                    <input type="text" class="form-control" placeholder="输入公司名称或联系人" id="modalSearchInput">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">联系电话</label>
+                    <input type="text" class="form-control" placeholder="输入联系电话" id="phoneSearchInput">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">所属行业</label>
+                    <select class="form-control" id="industryFilter">
+                        <option value="">全部行业</option>
+                        <option value="电子制造">电子制造</option>
+                        <option value="机械制造">机械制造</option>
+                        <option value="化工">化工</option>
+                        <option value="纺织">纺织</option>
+                        <option value="食品">食品</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="resetSearch()">重置</button>
+                <button class="btn btn-primary" onclick="performSearch()">搜索</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选模态框 -->
+    <div id="filterModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">筛选条件</h3>
+                <button class="modal-close" onclick="hideFilterModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">客户状态</label>
+                    <div class="filter-tabs" style="flex-wrap: wrap;">
+                        <button class="filter-tab active" data-status="all">全部</button>
+                        <button class="filter-tab" data-status="初步意向">初步意向</button>
+                        <button class="filter-tab" data-status="带看中">带看中</button>
+                        <button class="filter-tab" data-status="已成交">已成交</button>
+                        <button class="filter-tab" data-status="跟进中">跟进中</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">预算范围</label>
+                    <div class="grid-2">
+                        <input type="number" class="form-control" placeholder="最低预算" id="minBudget">
+                        <input type="number" class="form-control" placeholder="最高预算" id="maxBudget">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">面积需求</label>
+                    <div class="grid-2">
+                        <input type="number" class="form-control" placeholder="最小面积" id="minArea">
+                        <input type="number" class="form-control" placeholder="最大面积" id="maxArea">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">最后跟进时间</label>
+                    <select class="form-control" id="lastContactFilter">
+                        <option value="">全部</option>
+                        <option value="today">今天</option>
+                        <option value="week">本周</option>
+                        <option value="month">本月</option>
+                        <option value="overdue">超期未跟进</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="resetFilter()">重置</button>
+                <button class="btn btn-primary" onclick="applyFilter()">应用筛选</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+// 客户数据
+let customerData = [];
+let filteredCustomers = [];
+let currentFilter = 'all';
+let searchQuery = '';
+
+// 页面初始化
+document.addEventListener('DOMContentLoaded', function() {
+    loadCustomerData();
+});
+
+// 加载客户数据
+async function loadCustomerData() {
+    try {
+        const loadingState = document.getElementById('loadingState');
+        const customerList = document.getElementById('customerList');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (loadingState) loadingState.style.display = 'block';
+        if (customerList) customerList.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+        
+        // 模拟客户数据
+        const mockData = {
+            success: true,
+            data: [
+                {
+                    id: 1,
+                    companyName: '上海XX制造有限公司',
+                    contactName: '张经理',
+                    phone: '138-0000-1234',
+                    industry: '制造业',
+                    status: '意向客户',
+                    level: 'A',
+                    lastContact: '2024-09-01',
+                    budget: '100-200万',
+                    area: '2000-5000㎡',
+                    avatar: 'https://via.placeholder.com/50x50?text=张'
+                },
+                {
+                    id: 2,
+                    companyName: '深圳科技创新企业',
+                    contactName: '李总',
+                    phone: '139-1111-2222',
+                    industry: '电子信息',
+                    status: '带看中',
+                    level: 'A',
+                    lastContact: '2024-09-02',
+                    budget: '200-500万',
+                    area: '3000-8000㎡',
+                    avatar: 'https://via.placeholder.com/50x50?text=李'
+                },
+                {
+                    id: 3,
+                    companyName: '广州生物医药公司',
+                    contactName: '王董',
+                    phone: '137-2222-3333',
+                    industry: '生物医药',
+                    status: '已成交',
+                    level: 'A',
+                    lastContact: '2024-08-30',
+                    budget: '500万以上',
+                    area: '5000-10000㎡',
+                    avatar: 'https://via.placeholder.com/50x50?text=王'
+                },
+                {
+                    id: 4,
+                    companyName: '东莞智能装备有限公司',
+                    contactName: '陈经理',
+                    phone: '136-3333-4444',
+                    industry: '智能制造',
+                    status: '跟进中',
+                    level: 'B',
+                    lastContact: '2024-08-28',
+                    budget: '50-100万',
+                    area: '1000-3000㎡',
+                    avatar: 'https://via.placeholder.com/50x50?text=陈'
+                },
+                {
+                    id: 5,
+                    companyName: '佛山新材料研发中心',
+                    contactName: '刘主任',
+                    phone: '135-4444-5555',
+                    industry: '新材料',
+                    status: '初步意向',
+                    level: 'B',
+                    lastContact: '2024-08-25',
+                    budget: '100-200万',
+                    area: '2000-4000㎡',
+                    avatar: 'https://via.placeholder.com/50x50?text=刘'
+                }
+            ]
+        };
+        
+        if (mockData.success) {
+            customerData = mockData.data;
+            filteredCustomers = [...customerData];
+            
+            updateCustomerStats();
+            renderCustomerList();
+            
+            if (loadingState) loadingState.style.display = 'none';
+            if (customerData.length > 0) {
+                if (customerList) customerList.style.display = 'block';
+            } else {
+                if (emptyState) emptyState.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('加载客户数据失败:', error);
+        Utils.showToast('数据加载失败', 'error');
+    }
+}
+
+// 更新客户统计
+function updateCustomerStats() {
+    const total = customerData.length;
+    const intent = customerData.filter(c => c.status === '意向客户').length;
+    const viewing = customerData.filter(c => c.status === '带看中').length;
+    const deal = customerData.filter(c => c.status === '已成交').length;
+    
+    document.getElementById('totalCustomers').textContent = total;
+    document.getElementById('intentCustomers').textContent = intent;
+    document.getElementById('viewingCustomers').textContent = viewing;
+    document.getElementById('dealCustomers').textContent = deal;
+    
+    // 更新徽章
+    const badge = document.getElementById('customerBadge');
+    if (badge) badge.textContent = total;
+}
+
+// 渲染客户列表
+function renderCustomerList() {
+    const container = document.getElementById('customerList');
+    if (!container) return;
+    
+    if (filteredCustomers.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon"><i class="fas fa-search"></i></div>
+                <div class="title">没有找到匹配的客户</div>
+                <div class="description">尝试调整筛选条件或搜索关键词</div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filteredCustomers.map(customer => createCustomerCard(customer)).join('');
+}
+
+// 创建客户卡片
+function createCustomerCard(customer) {
+    const statusClass = getStatusClass(customer.status);
+    
+    return `
+        <div class="list-item customer-card" data-customer-id="${customer.id}">
+            <div class="customer-avatar">
+                <img src="${customer.avatar}" 
+                     alt="${customer.contactName}" 
+                     data-responsive 
+                     data-base-url="${customer.avatar.split('?')[0]}"
+                     data-sizes='{"xs":{"width":50,"height":50},"sm":{"width":60,"height":60},"md":{"width":80,"height":80}}'
+                     loading="lazy"
+                     data-lazy-processed="false"
+                     onerror="this.src='https://via.placeholder.com/50x50?text=${customer.contactName.charAt(0)}'">
+            </div>
+            
+            <div class="customer-info">
+                <div class="list-item-title">${customer.companyName}</div>
+                <div class="list-item-subtitle">
+                    <i class="fas fa-user mr-1"></i>
+                    ${customer.contactName} | ${customer.phone}
+                </div>
+                
+                <div class="customer-details">
+                    <div class="detail-item">
+                        <i class="fas fa-industry text-primary"></i>
+                        ${customer.industry}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-money-bill-wave text-success"></i>
+                        ${customer.budget}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-ruler-combined text-info"></i>
+                        ${customer.area}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-calendar text-warning"></i>
+                        ${customer.lastContact}
+                    </div>
+                </div>
+                
+                <div class="customer-meta">
+                    <div class="customer-level level-${customer.level.toLowerCase()}">
+                        ${customer.level}级客户
+                    </div>
+                    <div class="status-badge ${statusClass}">
+                        ${customer.status}
+                    </div>
+                </div>
+                
+                <div class="list-item-actions">
+                    <a href="detail.html?id=${customer.id}" class="list-item-action primary">
+                        <i class="fas fa-eye"></i>
+                        详情
+                    </a>
+                    <a href="follow.html?id=${customer.id}" class="list-item-action success">
+                        <i class="fas fa-plus"></i>
+                        跟进
+                    </a>
+                    <a href="edit.html?id=${customer.id}" class="list-item-action">
+                        <i class="fas fa-edit"></i>
+                        编辑
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 获取状态样式类
+function getStatusClass(status) {
+    const statusMap = {
+        '意向客户': 'warning',
+        '带看中': 'info',
+        '已成交': 'success',
+        '跟进中': 'primary',
+        '初步意向': 'secondary'
+    };
+    return statusMap[status] || 'secondary';
+}
+
+// 按状态筛选
+function filterByStatus(status) {
+    currentFilter = status;
+    
+    const filterTabs = document.querySelectorAll('.filter-tab[data-status]');
+    filterTabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.status === status) {
+            tab.classList.add('active');
+        }
+    });
+    
+    applyFilters();
+}
+
+// 搜索处理
+function handleSearch(query) {
+    searchQuery = query.toLowerCase();
+    applyFilters();
+}
+
+// 应用筛选条件
+function applyFilters() {
+    filteredCustomers = customerData.filter(customer => {
+        const statusMatch = currentFilter === 'all' || customer.status === currentFilter;
+        
+        const searchMatch = !searchQuery || 
+            customer.companyName.toLowerCase().includes(searchQuery) ||
+            customer.contactName.toLowerCase().includes(searchQuery) ||
+            customer.phone.toLowerCase().includes(searchQuery);
+        
+        return statusMatch && searchMatch;
+    });
+    
+    renderCustomerList();
+}
+
+// 显示搜索模态框
+function showSearchModal() {
+    document.getElementById('searchModal').style.display = 'flex';
+}
+
+// 隐藏搜索模态框
+function hideSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
+}
+
+// 显示筛选模态框  
+function showFilterModal() {
+    document.getElementById('filterModal').style.display = 'flex';
+}
+
+// 隐藏筛选模态框
+function hideFilterModal() {
+    document.getElementById('filterModal').style.display = 'none';
+}
+
+// 执行搜索
+function performSearch() {
+    const searchInput = document.getElementById('modalSearchInput').value;
+    const phoneInput = document.getElementById('phoneSearchInput').value;
+    const industry = document.getElementById('industryFilter').value;
+    
+    // 组合搜索条件
+    let query = '';
+    if (searchInput) query += searchInput + ' ';
+    if (phoneInput) query += phoneInput + ' ';
+    if (industry) query += industry + ' ';
+    
+    handleSearch(query.trim());
+    hideSearchModal();
+}
+
+// 重置搜索
+function resetSearch() {
+    document.getElementById('modalSearchInput').value = '';
+    document.getElementById('phoneSearchInput').value = '';
+    document.getElementById('industryFilter').value = '';
+    handleSearch('');
+}
+
+// 应用筛选
+function applyFilter() {
+    // 这里可以添加更复杂的筛选逻辑
+    hideFilterModal();
+    Utils.showToast('筛选条件已应用', 'success');
+}
+
+// 重置筛选
+function resetFilter() {
+    // 重置所有筛选条件
+    currentFilter = 'all';
+    searchQuery = '';
+    
+    // 重置UI
+    document.querySelectorAll('.filter-tab[data-status]').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector('.filter-tab[data-status="all"]').classList.add('active');
+    
+    applyFilters();
+}
+
+// 导出函数供全局使用
+window.filterByStatus = filterByStatus;
+window.handleSearch = handleSearch;
+window.showSearchModal = showSearchModal;
+window.hideSearchModal = hideSearchModal;
+window.showFilterModal = showFilterModal;
+window.hideFilterModal = hideFilterModal;
+window.performSearch = performSearch;
+window.resetSearch = resetSearch;
+window.applyFilter = applyFilter;
+window.resetFilter = resetFilter;
+    </script>
+</body>
+</html>

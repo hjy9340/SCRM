@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息通知 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .notification-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 60px;
+            z-index: 10;
+        }
+        
+        .tab-item {
+            flex: 1;
+            padding: var(--spacing-md);
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-item.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-badge {
+            position: absolute;
+            top: 8px;
+            right: 20px;
+            background: var(--error-color);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        .notification-list {
+            background: white;
+        }
+        
+        .notification-item {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+        
+        .notification-item:hover {
+            background-color: var(--bg-secondary);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(25, 118, 210, 0.05);
+        }
+        
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon.system {
+            background: var(--info-color);
+        }
+        
+        .notification-icon.business {
+            background: var(--success-color);
+        }
+        
+        .notification-icon.promotion {
+            background: var(--warning-color);
+        }
+        
+        .notification-icon.message {
+            background: var(--primary-color);
+        }
+        
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.4;
+        }
+        
+        .notification-desc {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .notification-time {
+            color: var(--text-hint);
+            font-size: var(--font-size-xs);
+        }
+        
+        .notification-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .notification-btn {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-small);
+            background: white;
+            cursor: pointer;
+            font-size: var(--font-size-xs);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-btn:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .notification-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .notification-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-hint);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .floating-actions {
+            position: fixed;
+            bottom: 80px;
+            right: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+        
+        .fab.secondary {
+            background: var(--text-hint);
+            width: 48px;
+            height: 48px;
+            font-size: 16px;
+        }
+        
+        .notification-filter {
+            padding: var(--spacing-md);
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .filter-select {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+        }
+        
+        @media (max-width: 768px) {
+            .notification-item {
+                padding: var(--spacing-sm);
+            }
+            
+            .notification-actions {
+                display: none;
+            }
+            
+            .floating-actions {
+                bottom: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">消息通知</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i>
+                    </button>
+                    <button class="navbar-action" onclick="openSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 分类标签 -->
+            <div class="notification-tabs">
+                <div class="tab-item active" onclick="switchTab('all')">
+                    全部
+                    <span class="tab-badge" id="allBadge">5</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('system')">
+                    系统通知
+                    <span class="tab-badge" id="systemBadge">2</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('business')">
+                    业务通知
+                    <span class="tab-badge" id="businessBadge">2</span>
+                </div>
+                <div class="tab-item" onclick="switchTab('promotion')">
+                    推广通知
+                    <span class="tab-badge" id="promotionBadge">1</span>
+                </div>
+            </div>
+
+            <!-- 筛选器 -->
+            <div class="notification-filter">
+                <i class="fas fa-filter text-hint mr-2"></i>
+                <select class="filter-select" onchange="filterNotifications(this.value)">
+                    <option value="all">全部消息</option>
+                    <option value="unread">未读消息</option>
+                    <option value="read">已读消息</option>
+                </select>
+                <select class="filter-select" onchange="sortNotifications(this.value)">
+                    <option value="time_desc">时间倒序</option>
+                    <option value="time_asc">时间正序</option>
+                    <option value="importance">重要性</option>
+                </select>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content p-0">
+                <div class="notification-list" id="notificationList">
+                    <!-- 系统通知 -->
+                    <div class="notification-item unread" data-type="system" data-id="1">
+                        <div class="notification-icon system">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">系统升级通知</div>
+                            <div class="notification-desc">系统将于今晚22:00-24:00进行升级维护，期间可能影响部分功能使用，请提前做好准备。</div>
+                            <div class="notification-time">2小时前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="readNotification(1)">查看详情</button>
+                            <button class="notification-btn" onclick="dismissNotification(1)">忽略</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item unread" data-type="business" data-id="2">
+                        <div class="notification-icon business">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">新客户咨询</div>
+                            <div class="notification-desc">李总对"天河区5000㎡厂房"项目感兴趣，已留下联系方式，请及时跟进。</div>
+                            <div class="notification-time">3小时前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="followupCustomer(2)">立即跟进</button>
+                            <button class="notification-btn" onclick="viewCustomer(2)">查看客户</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item" data-type="promotion" data-id="3">
+                        <div class="notification-icon promotion">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">佣金到账提醒</div>
+                            <div class="notification-desc">恭喜！您推广的"黄埔区仓库项目"成交，佣金25,000元已到账。</div>
+                            <div class="notification-time">5小时前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="viewCommission(3)">查看详情</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item unread" data-type="business" data-id="4">
+                        <div class="notification-icon business">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">今日待办提醒</div>
+                            <div class="notification-desc">您有3个客户需要今日跟进，2个房源需要更新信息，请及时处理。</div>
+                            <div class="notification-time">8小时前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="viewTodos(4)">查看待办</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item unread" data-type="system" data-id="5">
+                        <div class="notification-icon system">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">新功能上线</div>
+                            <div class="notification-desc">AI房源图片生成功能已上线！帮您快速生成专业的房源宣传图片，提升推广效果。</div>
+                            <div class="notification-time">1天前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="tryNewFeature(5)">立即体验</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-item" data-type="message" data-id="6">
+                        <div class="notification-icon message">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">团队消息</div>
+                            <div class="notification-desc">张经理在团队群中@了您："下周一开会讨论Q4业绩目标，请提前准备相关数据。"</div>
+                            <div class="notification-time">2天前</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="notification-btn primary" onclick="replyMessage(6)">回复</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 浮动操作按钮 -->
+            <div class="floating-actions">
+                <button class="fab secondary" onclick="refreshNotifications()" title="刷新">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="fab" onclick="composeMessage()" title="发送消息">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let currentTab = 'all';
+        let notifications = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotifications();
+            updateBadges();
+        });
+
+        function switchTab(tab) {
+            // 更新标签状态
+            document.querySelectorAll('.tab-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.tab-item').classList.add('active');
+            
+            currentTab = tab;
+            filterNotificationsByTab();
+        }
+
+        function filterNotificationsByTab() {
+            const items = document.querySelectorAll('.notification-item');
+            items.forEach(item => {
+                const type = item.dataset.type;
+                if (currentTab === 'all' || type === currentTab) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function filterNotifications(filter) {
+            const items = document.querySelectorAll('.notification-item');
+            items.forEach(item => {
+                const isUnread = item.classList.contains('unread');
+                let show = false;
+                
+                switch(filter) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'unread':
+                        show = isUnread;
+                        break;
+                    case 'read':
+                        show = !isUnread;
+                        break;
+                }
+                
+                if (show && (currentTab === 'all' || item.dataset.type === currentTab)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function sortNotifications(sortBy) {
+            const container = document.getElementById('notificationList');
+            const items = Array.from(container.children);
+            
+            items.sort((a, b) => {
+                const timeA = new Date(a.querySelector('.notification-time').textContent);
+                const timeB = new Date(b.querySelector('.notification-time').textContent);
+                
+                switch(sortBy) {
+                    case 'time_desc':
+                        return timeB - timeA;
+                    case 'time_asc':
+                        return timeA - timeB;
+                    case 'importance':
+                        // 简单的重要性排序：未读 > 已读
+                        const unreadA = a.classList.contains('unread');
+                        const unreadB = b.classList.contains('unread');
+                        return unreadB - unreadA;
+                    default:
+                        return 0;
+                }
+            });
+            
+            items.forEach(item => container.appendChild(item));
+        }
+
+        function markAllAsRead() {
+            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+            });
+            updateBadges();
+            showToast('所有消息已标记为已读', 'success');
+        }
+
+        function readNotification(id) {
+            const item = document.querySelector(`[data-id="${id}"]`);
+            item.classList.remove('unread');
+            updateBadges();
+            showToast('查看通知详情', 'info');
+        }
+
+        function dismissNotification(id) {
+            const item = document.querySelector(`[data-id="${id}"]`);
+            item.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                item.remove();
+                updateBadges();
+            }, 300);
+            showToast('通知已忽略', 'success');
+        }
+
+        function followupCustomer(id) {
+            showToast('跳转到客户跟进页面', 'info');
+            // window.location.href = '../customer/detail.html?id=xxx';
+        }
+
+        function viewCustomer(id) {
+            showToast('查看客户详情', 'info');
+        }
+
+        function viewCommission(id) {
+            showToast('查看佣金详情', 'info');
+        }
+
+        function viewTodos(id) {
+            showToast('查看待办事项', 'info');
+        }
+
+        function tryNewFeature(id) {
+            showToast('体验新功能', 'info');
+            // window.location.href = '../property/image-generator.html';
+        }
+
+        function replyMessage(id) {
+            showToast('回复团队消息', 'info');
+        }
+
+        function updateBadges() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            const unreadCount = unreadItems.length;
+            
+            // 更新总数
+            document.getElementById('allBadge').textContent = unreadCount;
+            document.getElementById('allBadge').style.display = unreadCount > 0 ? 'block' : 'none';
+            
+            // 更新各类型数量
+            const types = ['system', 'business', 'promotion'];
+            types.forEach(type => {
+                const count = document.querySelectorAll(`.notification-item.unread[data-type="${type}"]`).length;
+                const badge = document.getElementById(`${type}Badge`);
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'block' : 'none';
+            });
+        }
+
+        function loadNotifications() {
+            // 模拟加载通知数据
+            console.log('加载通知数据');
+        }
+
+        function refreshNotifications() {
+            showToast('刷新通知列表', 'info');
+            // 模拟刷新
+            const spinner = document.querySelector('.floating-actions .fa-sync-alt');
+            spinner.style.animation = 'spin 1s linear';
+            setTimeout(() => {
+                spinner.style.animation = '';
+            }, 1000);
+        }
+
+        function composeMessage() {
+            showModal({
+                title: '发送消息',
+                content: `
+                    <div class="form-group">
+                        <label class="form-label">收件人</label>
+                        <select class="form-input">
+                            <option>选择收件人</option>
+                            <option>团队成员</option>
+                            <option>管理员</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">消息内容</label>
+                        <textarea class="form-input" rows="4" placeholder="请输入消息内容"></textarea>
+                    </div>
+                `,
+                buttons: [
+                    { text: '取消', type: 'secondary' },
+                    { text: '发送', type: 'primary', onclick: sendMessage }
+                ]
+            });
+        }
+
+        function sendMessage() {
+            showToast('消息发送成功', 'success');
+            hideModal();
+        }
+
+        function openSettings() {
+            window.location.href = 'settings.html';
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户详情 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="../../assets/css/image-optimization.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 客户画像样式 */
+        .customer-profile {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+        }
+        
+        .profile-section {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .profile-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .profile-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-base);
+        }
+        
+        .intention-level {
+            background: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        .level-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .level-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--primary-color));
+            transition: width 0.8s ease;
+        }
+        
+        .level-text {
+            font-weight: 600;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+        
+        .behavior-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--border-radius-small);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        .tag.tag-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .tag.tag-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .tag.tag-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .tag.tag-info {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .preference-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .preference-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: white;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        .pref-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        
+        .pref-content {
+            flex: 1;
+        }
+        
+        .pref-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .pref-value {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .conversion-probability {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+        }
+        
+        .probability-circle {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .circle-progress {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--success-color) 0deg 245deg, var(--border-color) 245deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .circle-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-primary);
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .probability-desc {
+            flex: 1;
+        }
+        
+        .prob-status {
+            font-weight: 600;
+            color: var(--success-color);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .prob-suggestion {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            line-height: 1.4;
+        }
+        
+        /* 跟进记录样式 */
+        .timeline {
+            position: relative;
+            padding-left: var(--spacing-xl);
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: var(--spacing-md);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .timeline-time {
+            color: var(--text-hint);
+            font-size: var(--font-size-sm);
+        }
+        
+        .timeline-content {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .timeline-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-sm);
+            color: var(--text-hint);
+        }
+        
+        .follow-type {
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: var(--font-size-xs);
+        }
+        
+        .follow-type.phone {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .follow-type.visit {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .follow-type.wechat {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .follow-type.email {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        /* 图片优化样式 */
+        .lazy-image {
+            transition: opacity 0.3s ease;
+        }
+        
+        .lazy-image.loading {
+            opacity: 0.7;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+        
+        .lazy-image.error {
+            opacity: 1;
+            filter: grayscale(100%);
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* 占位符样式 */
+        .image-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            color: var(--text-hint);
+            font-size: var(--font-size-sm);
+        }
+        
+        @media (max-width: 768px) {
+            .conversion-probability {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-md);
+            }
+            
+            .preference-items {
+                gap: var(--spacing-xs);
+            }
+            
+            .preference-item {
+                padding: var(--spacing-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">客户详情</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="editCustomer()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="navbar-action" onclick="showMoreActions()">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 客户基本信息 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-building text-primary mr-2"></i>
+                        客户基本信息
+                    </div>
+                    <div class="card-body">
+                        <div class="customer-info">
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-user-circle"></i>
+                                    客户头像
+                                </div>
+                                <div class="info-value">
+                                    <div class="customer-avatar" id="customerAvatar" style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; display: inline-block;">
+                                        <img src="https://via.placeholder.com/60x60?text=客" alt="客户头像" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-building"></i>
+                                    公司名称
+                                </div>
+                                <div class="info-value" id="companyName">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-user"></i>
+                                    联系人
+                                </div>
+                                <div class="info-value" id="contactPerson">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-phone"></i>
+                                    联系电话
+                                </div>
+                                <div class="info-value">
+                                    <a href="#" id="contactPhone" class="text-primary">-</a>
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-envelope"></i>
+                                    邮箱地址
+                                </div>
+                                <div class="info-value" id="email">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-industry"></i>
+                                    所属行业
+                                </div>
+                                <div class="info-value" id="industry">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    公司地址
+                                </div>
+                                <div class="info-value" id="address">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 需求信息 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-list-alt text-warning mr-2"></i>
+                        需求信息
+                    </div>
+                    <div class="card-body">
+                        <div class="customer-info">
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    预算范围
+                                </div>
+                                <div class="info-value" id="budget">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-ruler-combined"></i>
+                                    面积需求
+                                </div>
+                                <div class="info-value" id="areaRequirement">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-map-pin"></i>
+                                    期望区域
+                                </div>
+                                <div class="info-value" id="preferredArea">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-arrows-alt-v"></i>
+                                    层高要求
+                                </div>
+                                <div class="info-value" id="heightRequirement">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-weight"></i>
+                                    承重要求
+                                </div>
+                                <div class="info-value" id="loadRequirement">-</div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">
+                                    <i class="fas fa-sticky-note"></i>
+                                    其他需求
+                                </div>
+                                <div class="info-value" id="otherRequirements">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 状态和操作 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line text-success mr-2"></i>
+                        当前状态
+                    </div>
+                    <div class="card-body">
+                        <div class="status-section">
+                            <div class="current-status">
+                                <div class="status-badge primary" id="currentStatus">
+                                    初步意向
+                                </div>
+                                <div class="status-time text-secondary" id="statusTime">
+                                    更新于 2小时前
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="recommendProperties()">
+                                    <i class="fas fa-building"></i>
+                                    推荐房源
+                                </button>
+                                <button class="btn btn-success" onclick="addFollowUp()">
+                                    <i class="fas fa-plus"></i>
+                                    添加跟进
+                                </button>
+                                <button class="btn btn-warning" onclick="changeStatus()">
+                                    <i class="fas fa-exchange-alt"></i>
+                                    更改状态
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 客户画像 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-tag text-purple mr-2"></i>
+                        客户画像
+                        <button class="btn btn-small btn-secondary ml-auto" onclick="refreshProfile()">
+                            <i class="fas fa-sync-alt"></i>
+                            刷新
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="customer-profile">
+                            <!-- 意向等级 -->
+                            <div class="profile-section">
+                                <div class="profile-label">意向等级</div>
+                                <div class="intention-level">
+                                    <div class="level-indicator" id="intentionLevel">
+                                        <div class="level-bar">
+                                            <div class="level-fill" style="width: 75%;"></div>
+                                        </div>
+                                        <div class="level-text">高意向 (75%)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 行为标签 -->
+                            <div class="profile-section">
+                                <div class="profile-label">行为标签</div>
+                                <div class="behavior-tags">
+                                    <span class="tag tag-primary">多次浏览</span>
+                                    <span class="tag tag-success">主动咨询</span>
+                                    <span class="tag tag-warning">价格敏感</span>
+                                    <span class="tag tag-info">决策较快</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 偏好分析 -->
+                            <div class="profile-section">
+                                <div class="profile-label">偏好分析</div>
+                                <div class="preference-items">
+                                    <div class="preference-item">
+                                        <div class="pref-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                        <div class="pref-content">
+                                            <div class="pref-title">区域偏好</div>
+                                            <div class="pref-value">天河区、黄埔区</div>
+                                        </div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="pref-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+                                        <div class="pref-content">
+                                            <div class="pref-title">面积偏好</div>
+                                            <div class="pref-value">3000-8000㎡</div>
+                                        </div>
+                                    </div>
+                                    <div class="preference-item">
+                                        <div class="pref-icon"><i class="fas fa-coins"></i></div>
+                                        <div class="pref-content">
+                                            <div class="pref-title">价格偏好</div>
+                                            <div class="pref-value">15-25万/月</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 成交概率 -->
+                            <div class="profile-section">
+                                <div class="profile-label">成交概率预测</div>
+                                <div class="conversion-probability">
+                                    <div class="probability-circle">
+                                        <div class="circle-progress" data-percent="68">
+                                            <div class="circle-fill"></div>
+                                            <div class="circle-text">68%</div>
+                                        </div>
+                                    </div>
+                                    <div class="probability-desc">
+                                        <div class="prob-status">较高概率</div>
+                                        <div class="prob-suggestion">建议加强跟进，推荐优质房源</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 跟进记录 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history text-info mr-2"></i>
+                        跟进记录
+                        <button class="btn btn-small btn-primary ml-auto" onclick="Navigation.goto('follow.html?id=' + customerId)">
+                            <i class="fas fa-plus"></i>
+                            添加
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="followUpList" class="timeline">
+                            <!-- 跟进记录将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div class="text-center mt-3" id="loadMoreFollowUps" style="display: none;">
+                            <button class="btn btn-secondary btn-small" onclick="loadMoreFollowUps()">
+                                查看更多记录
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="../promotion/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 更多操作模态框 -->
+    <div id="moreActionsModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">更多操作</h3>
+                <button class="modal-close" onclick="hideMoreActions()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="action-list">
+                    <button class="action-item" onclick="shareCustomer()">
+                        <i class="fas fa-share"></i>
+                        分享客户信息
+                    </button>
+                    <button class="action-item" onclick="exportCustomer()">
+                        <i class="fas fa-download"></i>
+                        导出客户资料
+                    </button>
+                    <button class="action-item" onclick="duplicateCustomer()">
+                        <i class="fas fa-copy"></i>
+                        复制为新客户
+                    </button>
+                    <button class="action-item text-error" onclick="deleteCustomer()">
+                        <i class="fas fa-trash"></i>
+                        删除客户
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 状态更改模态框 -->
+    <div id="statusModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">更改客户状态</h3>
+                <button class="modal-close" onclick="hideStatusModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">选择新状态</label>
+                    <div class="status-options">
+                        <button class="status-option" data-status="初步意向">
+                            <div class="status-badge primary">初步意向</div>
+                            <div class="status-desc">客户有购买/租赁意向</div>
+                        </button>
+                        <button class="status-option" data-status="带看中">
+                            <div class="status-badge warning">带看中</div>
+                            <div class="status-desc">正在安排或进行实地看房</div>
+                        </button>
+                        <button class="status-option" data-status="谈判中">
+                            <div class="status-badge info">谈判中</div>
+                            <div class="status-desc">正在协商价格和条款</div>
+                        </button>
+                        <button class="status-option" data-status="已成交">
+                            <div class="status-badge success">已成交</div>
+                            <div class="status-desc">交易已完成</div>
+                        </button>
+                        <button class="status-option" data-status="暂停跟进">
+                            <div class="status-badge secondary">暂停跟进</div>
+                            <div class="status-desc">暂时停止跟进</div>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">状态变更说明</label>
+                    <textarea class="form-control" id="statusNote" placeholder="请输入状态变更的原因或说明..." rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideStatusModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmStatusChange()">确认更改</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script src="../../assets/js/customer-detail.js"></script>
+</body>
+</html>
+
+<style>
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 100px;
+}
+
+.info-label i {
+    width: 16px;
+    font-size: 16px;
+}
+
+.info-value {
+    flex: 1;
+    text-align: right;
+    color: var(--text-primary);
+}
+
+.status-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.current-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-time {
+    font-size: var(--font-size-sm);
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.action-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-item {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.action-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.action-item:last-child {
+    border-bottom: none;
+}
+
+.action-item i {
+    width: 20px;
+    font-size: 16px;
+}
+
+.status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.status-option {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.status-option:hover {
+    border-color: var(--primary-color);
+}
+
+.status-option.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(25, 118, 210, 0.1);
+}
+
+.status-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+@media (max-width: 576px) {
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .info-value {
+        text-align: left;
+    }
+}
+</style>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let customerId = null;
+        let customerData = null;
+        let followUpData = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            customerId = getUrlParameter('id') || 'demo-customer-001';
+            loadCustomerData();
+            loadFollowUpData();
+            
+            // 初始化图片优化
+            setTimeout(() => {
+                if (window.initImageOptimization) {
+                    window.initImageOptimization();
+                }
+            }, 500);
+        });
+
+        function renderCustomerData() {
+            if (!customerData) return;
+            document.getElementById('companyName').textContent = customerData.companyName;
+            document.getElementById('contactPerson').textContent = customerData.contactPerson;
+            document.getElementById('contactPhone').textContent = customerData.phone;
+            document.getElementById('email').textContent = customerData.email;
+            document.getElementById('industry').textContent = customerData.industry;
+            
+            // 设置客户头像
+            const avatarContainer = document.getElementById('customerAvatar');
+            if (customerData.avatar) {
+                avatarContainer.innerHTML = `<img src="${customerData.avatar}" alt="客户头像" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                // 使用默认头像
+                const firstChar = customerData.contactPerson.charAt(0);
+                avatarContainer.innerHTML = `<img src="https://via.placeholder.com/60x60?text=${encodeURIComponent(firstChar)}" alt="客户头像" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+        }
+
+        async function loadCustomerData() {
+            customerData = {
+                companyName: '广州智造科技有限公司',
+                contactPerson: '李总',
+                phone: '138-2345-6789',
+                email: 'li@smarttech.com',
+                industry: '电子制造',
+                profile: { intentionLevel: 75, conversionProbability: 68 },
+                avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop'
+            };
+            renderCustomerData();
+        }
+
+        async function loadFollowUpData() {
+            const mockFollowUps = [
+                { id: 1, type: 'phone', title: '电话沟通', content: '与客户沟通房源需求', createTime: '2024-09-02 14:30', creator: '王销售' },
+                { id: 2, type: 'visit', title: '实地看房', content: '陪同客户实地查看厂房', createTime: '2024-09-01 15:45', creator: '王销售' }
+            ];
+            followUpData = mockFollowUps;
+            renderFollowUpList();
+        }
+
+        function renderFollowUpList() {
+            const container = document.getElementById('followUpList');
+            if (!container) return;
+            container.innerHTML = followUpData.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div class="timeline-title">${item.title}</div>
+                        <div class="timeline-time">${item.createTime}</div>
+                    </div>
+                    <div class="timeline-content">${item.content}</div>
+                    <div class="timeline-meta">
+                        <span class="follow-type ${item.type}">${{phone:'电话',visit:'实地'}[item.type]}</span>
+                        <div>跟进人：${item.creator}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function refreshProfile() { showToast('客户画像刷新完成', 'success'); }
+        function recommendProperties() { showToast('正在匹配房源...', 'info'); }
+        function addFollowUp() { showToast('跳转到跟进记录页面', 'info'); }
+        function changeStatus() { document.getElementById('statusModal').style.display = 'flex'; }
+        function hideStatusModal() { document.getElementById('statusModal').style.display = 'none'; }
+        function editCustomer() { showToast('跳转到客户编辑页面', 'info'); }
+        function showMoreActions() { document.getElementById('moreActionsModal').style.display = 'flex'; }
+        function hideMoreActions() { document.getElementById('moreActionsModal').style.display = 'none'; }
+        function getUrlParameter(name) { return new URLSearchParams(window.location.search).get(name); }
+    </script>
+</body>
+</html>

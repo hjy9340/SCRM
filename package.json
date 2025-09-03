@@ -1,0 +1,25 @@
+{
+  "name": "scrm-prototype",
+  "version": "1.0.0",
+  "description": "工业地产SCRM系统原型页面",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/pages/",
+    "build": "echo 'Build completed'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "SCRM",
+    "CRM",
+    "工业地产",
+    "原型设计",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+  "author": "SCRM Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

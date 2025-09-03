@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工业地产SCRM系统</title>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <!-- 图标字体 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <div class="navbar-brand">
+                    <i class="fas fa-industry"></i>
+                    SCRM系统
+                </div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <button class="navbar-action" onclick="showProfile()">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 数据概览卡片 -->
+                <section class="stats-cards">
+                    <div class="stats-card" onclick="viewDailyStats()">
+                        <div class="number">5</div>
+                        <div class="label">今日客户</div>
+                    </div>
+                    <div class="stats-card" onclick="viewWeeklyStats()">
+                        <div class="number">23</div>
+                        <div class="label">本周跟进</div>
+                    </div>
+                    <div class="stats-card" onclick="viewMonthlyStats()">
+                        <div class="number">8</div>
+                        <div class="label">本月成交</div>
+                    </div>
+                </section>
+
+                <!-- 快捷功能入口 -->
+                <section class="quick-actions">
+                    <h2 class="text-lg font-semibold mb-3">快捷功能</h2>
+                    <div class="quick-grid">
+                        <a href="customer/add.html" class="quick-action">
+                            <div class="icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="title">添加客户</div>
+                        </a>
+                        <a href="property/add.html" class="quick-action">
+                            <div class="icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="title">发布房源</div>
+                        </a>
+                        <a href="promotion/poster.html" class="quick-action">
+                            <div class="icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="title">生成海报</div>
+                        </a>
+                        <a href="promotion/stats.html" class="quick-action">
+                            <div class="icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="title">推广统计</div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 最近动态列表 -->
+                <section class="recent-activities">
+                    <h2 class="text-lg font-semibold mb-3">最近动态</h2>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">2小时前</div>
+                                <div class="timeline-title">
+                                    <i class="fas fa-eye text-primary mr-2"></i>
+                                    张三预约看房
+                                </div>
+                                <div class="timeline-desc">
+                                    深圳XX科技公司的张经理预约明天下午参观宝安工业园厂房
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">3小时前</div>
+                                <div class="timeline-title">
+                                    <i class="fas fa-phone text-success mr-2"></i>
+                                    李四咨询厂房
+                                </div>
+                                <div class="timeline-desc">
+                                    广州YY制造的李总电话咨询松山湖独栋厂房的租金和配套情况
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">1天前</div>
+                                <div class="timeline-title">
+                                    <i class="fas fa-handshake text-warning mr-2"></i>
+                                    王五成交确认
+                                </div>
+                                <div class="timeline-desc">
+                                    东莞ZZ科技确认租赁东莞松山湖厂房，合同金额200万元
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-time">2天前</div>
+                                <div class="timeline-title">
+                                    <i class="fas fa-share text-info mr-2"></i>
+                                    房源推广分享
+                                </div>
+                                <div class="timeline-desc">
+                                    宝安工业园厂房通过朋友圈分享，获得156次浏览，12次咨询
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="#" class="btn btn-secondary" onclick="loadMoreActivities()">
+                            查看更多动态
+                        </a>
+                    </div>
+                </section>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="customer/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                    <span class="badge">5</span>
+                </a>
+                <a href="property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="promotion/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <button class="fab" onclick="showQuickActions()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- 通知模态框 -->
+    <div id="notificationModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">通知消息</h3>
+                <button class="modal-close" onclick="hideNotifications()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <div class="list-item-title">系统通知</div>
+                        <div class="text-sm text-secondary">2小时前</div>
+                    </div>
+                    <div class="list-item-subtitle">
+                        新版本功能上线，支持AI智能客户匹配
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <div class="list-item-title">客户提醒</div>
+                        <div class="text-sm text-secondary">3小时前</div>
+                    </div>
+                    <div class="list-item-subtitle">
+                        张经理预约明天14:00看房，请及时确认
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-header">
+                        <div class="list-item-title">推广统计</div>
+                        <div class="text-sm text-secondary">1天前</div>
+                    </div>
+                    <div class="list-item-subtitle">
+                        本周推广效果报告已生成，请查看详细数据
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快捷操作模态框 -->
+    <div id="quickActionModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">快捷操作</h3>
+                <button class="modal-close" onclick="hideQuickActions()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="quick-grid">
+                    <a href="customer/add.html" class="quick-action">
+                        <div class="icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="title">添加客户</div>
+                    </a>
+                    <a href="property/add.html" class="quick-action">
+                        <div class="icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="title">发布房源</div>
+                    </a>
+                    <a href="customer/follow.html" class="quick-action">
+                        <div class="icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="title">客户跟进</div>
+                    </a>
+                    <a href="promotion/poster.html" class="quick-action">
+                        <div class="icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="title">生成海报</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/home.js"></script>
+</body>
+</html>

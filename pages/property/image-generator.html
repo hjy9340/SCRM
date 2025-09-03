@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI房源图片生成器 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .generator-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            height: 100vh;
+            gap: var(--spacing-md);
+        }
+        
+        .sidebar {
+            background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+        
+        .template-item {
+            aspect-ratio: 4/3;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .template-item:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+        
+        .template-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+        
+        .template-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .template-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: var(--spacing-xs);
+            font-size: var(--font-size-sm);
+            text-align: center;
+        }
+        
+        .canvas-area {
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .canvas-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .property-canvas {
+            width: 600px;
+            height: 400px;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .canvas-toolbar {
+            position: absolute;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            right: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+        
+        .toolbar-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toolbar-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+        
+        .property-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-xl);
+            color: white;
+        }
+        
+        .property-header {
+            margin-bottom: auto;
+        }
+        
+        .property-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .property-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .property-features {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+        }
+        
+        .property-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .property-price {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .contact-info {
+            text-align: right;
+            font-size: var(--font-size-sm);
+        }
+        
+        .controls-panel {
+            background: white;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-xs);
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3);
+        }
+        
+        .action-buttons {
+            position: absolute;
+            bottom: var(--spacing-lg);
+            left: var(--spacing-lg);
+            right: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .btn-ai {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .generation-progress {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 20;
+            display: none;
+        }
+        
+        .progress-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-md);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1200px) {
+            .generator-container {
+                grid-template-columns: 250px 1fr 250px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .generator-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .controls-panel {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+            
+            .property-canvas {
+                width: 100%;
+                max-width: 400px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="generator-container">
+        <!-- 左侧模板选择 -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <i class="fas fa-layer-group mr-2"></i>
+                    选择模板
+                </h3>
+                <div class="template-grid">
+                    <div class="template-item active" data-template="modern" onclick="selectTemplate('modern')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                        <div class="template-name">现代简约</div>
+                    </div>
+                    <div class="template-item" data-template="business" onclick="selectTemplate('business')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #2c3e50, #34495e);"></div>
+                        <div class="template-name">商务风格</div>
+                    </div>
+                    <div class="template-item" data-template="industrial" onclick="selectTemplate('industrial')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"></div>
+                        <div class="template-name">工业风格</div>
+                    </div>
+                    <div class="template-item" data-template="minimal" onclick="selectTemplate('minimal')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #bdc3c7, #95a5a6);"></div>
+                        <div class="template-name">极简风格</div>
+                    </div>
+                    <div class="template-item" data-template="luxury" onclick="selectTemplate('luxury')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #f7931e, #ffd700);"></div>
+                        <div class="template-name">豪华风格</div>
+                    </div>
+                    <div class="template-item" data-template="tech" onclick="selectTemplate('tech')">
+                        <div class="template-preview" style="background: linear-gradient(135deg, #00c9ff, #92fe9d);"></div>
+                        <div class="template-name">科技风格</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <i class="fas fa-palette mr-2"></i>
+                    配色方案
+                </h3>
+                <div class="color-picker">
+                    <div class="color-option active" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="selectColor('blue')"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #2c3e50, #34495e);" onclick="selectColor('dark')"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #e74c3c, #c0392b);" onclick="selectColor('red')"></div>
+                    <div class="color-option" style="background: linear-gradient(135deg, #27ae60, #2ecc71);" onclick="selectColor('green')"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间画布区域 -->
+        <div class="canvas-area">
+            <div class="canvas-container">
+                <div class="canvas-toolbar">
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" onclick="undoAction()" title="撤销">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="redoAction()" title="重做">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" onclick="zoomOut()" title="缩小">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="resetZoom()" title="适应">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                        <button class="toolbar-btn" onclick="zoomIn()" title="放大">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="property-canvas" id="propertyCanvas">
+                    <div class="property-content">
+                        <div class="property-header">
+                            <div class="property-title" id="canvasTitle">优质工业厂房出租</div>
+                            <div class="property-subtitle" id="canvasSubtitle">广州市天河区黄埔大道西</div>
+                        </div>
+                        
+                        <div class="property-features" id="canvasFeatures">
+                            <div class="feature-item">5000㎡</div>
+                            <div class="feature-item">层高8米</div>
+                            <div class="feature-item">可分租</div>
+                        </div>
+                        
+                        <div class="property-footer">
+                            <div class="property-price" id="canvasPrice">¥25万/月</div>
+                            <div class="contact-info" id="canvasContact">
+                                <div>王经理</div>
+                                <div>138-0000-1234</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="generation-progress" id="generationProgress">
+                        <div class="progress-spinner"></div>
+                        <div>AI正在生成图片...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-ai" onclick="generateWithAI()">
+                    <i class="fas fa-magic mr-2"></i>
+                    AI智能生成
+                </button>
+                <button class="btn btn-primary" onclick="downloadImage()">
+                    <i class="fas fa-download mr-2"></i>
+                    下载图片
+                </button>
+            </div>
+        </div>
+        
+        <!-- 右侧控制面板 -->
+        <div class="controls-panel">
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <i class="fas fa-edit mr-2"></i>
+                    编辑内容
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">房源标题</label>
+                    <input type="text" class="form-input" id="titleInput" value="优质工业厂房出租" onchange="updateCanvas()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">副标题</label>
+                    <input type="text" class="form-input" id="subtitleInput" value="广州市天河区黄埔大道西" onchange="updateCanvas()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">价格</label>
+                    <input type="text" class="form-input" id="priceInput" value="¥25万/月" onchange="updateCanvas()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">联系人</label>
+                    <input type="text" class="form-input" id="contactInput" value="王经理" onchange="updateCanvas()">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">联系电话</label>
+                    <input type="text" class="form-input" id="phoneInput" value="138-0000-1234" onchange="updateCanvas()">
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="section-title">
+                    <i class="fas fa-cogs mr-2"></i>
+                    AI设置
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">生成风格</label>
+                    <select class="form-input" id="aiStyle">
+                        <option value="realistic">真实风格</option>
+                        <option value="artistic">艺术风格</option>
+                        <option value="professional">专业风格</option>
+                        <option value="modern">现代风格</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">图片质量</label>
+                    <select class="form-input" id="imageQuality">
+                        <option value="standard">标准质量</option>
+                        <option value="high">高质量</option>
+                        <option value="ultra">超高质量</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTemplate = 'modern';
+        let currentColor = 'blue';
+        
+        const templates = {
+            modern: { background: 'linear-gradient(135deg, #667eea, #764ba2)' },
+            business: { background: 'linear-gradient(135deg, #2c3e50, #34495e)' },
+            industrial: { background: 'linear-gradient(135deg, #e74c3c, #c0392b)' },
+            minimal: { background: 'linear-gradient(135deg, #bdc3c7, #95a5a6)' }
+        };
+        
+        const colors = {
+            blue: 'linear-gradient(135deg, #667eea, #764ba2)',
+            dark: 'linear-gradient(135deg, #2c3e50, #34495e)',
+            red: 'linear-gradient(135deg, #e74c3c, #c0392b)',
+            green: 'linear-gradient(135deg, #27ae60, #2ecc71)'
+        };
+
+        function selectTemplate(template) {
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-template="${template}"]`).classList.add('active');
+            
+            currentTemplate = template;
+            updateCanvasStyle();
+        }
+
+        function selectColor(color) {
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            currentColor = color;
+            updateCanvasStyle();
+        }
+
+        function updateCanvasStyle() {
+            const canvas = document.getElementById('propertyCanvas');
+            canvas.style.background = colors[currentColor];
+        }
+
+        function updateCanvas() {
+            document.getElementById('canvasTitle').textContent = document.getElementById('titleInput').value;
+            document.getElementById('canvasSubtitle').textContent = document.getElementById('subtitleInput').value;
+            document.getElementById('canvasPrice').textContent = document.getElementById('priceInput').value;
+            
+            const contactDiv = document.getElementById('canvasContact');
+            contactDiv.innerHTML = `
+                <div>${document.getElementById('contactInput').value}</div>
+                <div>${document.getElementById('phoneInput').value}</div>
+            `;
+        }
+
+        function generateWithAI() {
+            const progress = document.getElementById('generationProgress');
+            const style = document.getElementById('aiStyle').value;
+            const quality = document.getElementById('imageQuality').value;
+            
+            progress.style.display = 'block';
+            
+            // 模拟AI生成过程
+            let step = 0;
+            const steps = ['分析房源信息...', '生成背景元素...', '优化图片质量...', '渲染最终效果...'];
+            
+            const progressText = progress.querySelector('div:last-child');
+            
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    progressText.textContent = steps[step];
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    
+                    // 模拟生成不同风格的图片
+                    applyAIStyle(style, quality);
+                    
+                    progress.style.display = 'none';
+                    showToast('AI图片生成完成！', 'success');
+                }
+            }, 800);
+        }
+        
+        function applyAIStyle(style, quality) {
+            const canvas = document.getElementById('propertyCanvas');
+            
+            // 根据选择的风格应用不同的效果
+            switch(style) {
+                case 'realistic':
+                    canvas.style.filter = 'contrast(1.1) saturate(1.1)';
+                    break;
+                case 'artistic':
+                    canvas.style.filter = 'contrast(1.2) saturate(1.3) hue-rotate(10deg)';
+                    break;
+                case 'professional':
+                    canvas.style.filter = 'contrast(1.05) saturate(0.95)';
+                    break;
+                case 'modern':
+                    canvas.style.filter = 'contrast(1.15) saturate(1.2) brightness(1.05)';
+                    break;
+            }
+            
+            // 根据质量设置调整分辨率等
+            const qualitySettings = {
+                'standard': { scale: 1.0, blur: 0 },
+                'high': { scale: 1.2, blur: 0 },
+                'ultra': { scale: 1.5, blur: 0 }
+            };
+            
+            const setting = qualitySettings[quality] || qualitySettings['standard'];
+            canvas.style.transform = `scale(${setting.scale})`;
+        }
+
+        function downloadImage() {
+            // 使用html2canvas库生成图片
+            const canvas = document.getElementById('propertyCanvas');
+            
+            // 这里应该集成html2canvas或类似库
+            showToast('图片下载功能开发中', 'info');
+        }
+
+        function undoAction() {
+            showToast('撤销操作', 'info');
+        }
+
+        function redoAction() {
+            showToast('重做操作', 'info');
+        }
+
+        function zoomIn() {
+            const canvas = document.getElementById('propertyCanvas');
+            const currentWidth = canvas.offsetWidth;
+            canvas.style.width = Math.min(currentWidth * 1.2, 800) + 'px';
+        }
+
+        function zoomOut() {
+            const canvas = document.getElementById('propertyCanvas');
+            const currentWidth = canvas.offsetWidth;
+            canvas.style.width = Math.max(currentWidth * 0.8, 400) + 'px';
+        }
+
+        function resetZoom() {
+            document.getElementById('propertyCanvas').style.width = '600px';
+        }
+
+        function showToast(message, type = 'info') {
+            // 简单的提示实现
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解析URL参数
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // 如果有传递房源信息，则自动填充
+            if (urlParams.has('title')) {
+                document.getElementById('titleInput').value = urlParams.get('title');
+            }
+            if (urlParams.has('location')) {
+                document.getElementById('subtitleInput').value = urlParams.get('location');
+            }
+            if (urlParams.has('price')) {
+                const price = urlParams.get('price');
+                const type = urlParams.get('type') || '出租';
+                const priceText = type === '出租' ? `¥${price}万/月` : `¥${price}万`;
+                document.getElementById('priceInput').value = priceText;
+            }
+            
+            updateCanvas();
+        });
+    </script>
+</body>
+</html>

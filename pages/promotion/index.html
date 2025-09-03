@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推广中心 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">推广中心</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="showHelp()">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 收益概览 -->
+                <div class="revenue-overview">
+                    <div class="revenue-bg"></div>
+                    <div class="revenue-content">
+                        <div class="revenue-main">
+                            <div class="revenue-label">累计收益</div>
+                            <div class="revenue-amount" id="totalRevenue">¥12,580</div>
+                        </div>
+                        <div class="revenue-stats">
+                            <div class="revenue-stat">
+                                <div class="stat-value" id="monthRevenue">¥2,680</div>
+                                <div class="stat-label">本月收益</div>
+                            </div>
+                            <div class="revenue-stat">
+                                <div class="stat-value" id="totalViews">1,234</div>
+                                <div class="stat-label">总浏览量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷功能 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-rocket text-primary mr-2"></i>
+                        快捷功能
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions-grid">
+                            <a href="poster.html" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="action-title">生成海报</div>
+                                <div class="action-desc">制作推广海报</div>
+                            </a>
+                            
+                            <a href="link.html" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div class="action-title">创建链接</div>
+                                <div class="action-desc">生成推广链接</div>
+                            </a>
+                            
+                            <a href="analytics.html" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="action-title">数据分析</div>
+                                <div class="action-desc">详细数据分析</div>
+                            </a>
+                            
+                            <a href="withdrawal.html" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="action-title">提现管理</div>
+                                <div class="action-desc">收益提现申请</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推广房源 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-building text-success mr-2"></i>
+                        我的推广房源
+                        <button class="btn btn-small btn-primary ml-auto" onclick="addPromotionProperty()">
+                            <i class="fas fa-plus"></i>
+                            添加
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="promotionProperties" class="promotion-properties">
+                            <!-- 推广房源列表将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div id="emptyPromotions" class="empty-state" style="display: none;">
+                            <div class="icon">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                            <div class="title">暂无推广房源</div>
+                            <div class="description">添加房源开始推广赚取佣金</div>
+                            <button class="btn btn-primary" onclick="addPromotionProperty()">
+                                <i class="fas fa-plus"></i>
+                                添加推广房源
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 收益记录 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history text-warning mr-2"></i>
+                        最近收益记录
+                        <a href="revenue-history.html" class="text-primary ml-auto">查看全部</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="revenueRecords" class="revenue-records">
+                            <!-- 收益记录将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推广技巧 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-lightbulb text-info mr-2"></i>
+                        推广技巧
+                    </div>
+                    <div class="card-body">
+                        <div class="tips-list">
+                            <div class="tip-item">
+                                <div class="tip-icon">
+                                    <i class="fas fa-share-alt"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <div class="tip-title">多渠道分享</div>
+                                    <div class="tip-desc">在朋友圈、微信群、QQ群等多个渠道分享，增加曝光度</div>
+                                </div>
+                            </div>
+                            
+                            <div class="tip-item">
+                                <div class="tip-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <div class="tip-title">精准推广</div>
+                                    <div class="tip-desc">针对有厂房需求的企业主和采购负责人进行推广</div>
+                                </div>
+                            </div>
+                            
+                            <div class="tip-item">
+                                <div class="tip-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <div class="tip-title">持续跟进</div>
+                                    <div class="tip-desc">及时回复客户咨询，提供专业的服务和建议</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="../customer/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <button class="fab" onclick="showQuickMenu()">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+// 推广中心页面功能
+let promotionData = null;
+
+// 页面初始化
+document.addEventListener('DOMContentLoaded', function() {
+    loadPromotionData();
+});
+
+// 加载推广数据
+async function loadPromotionData() {
+    try {
+        Utils.showLoading('加载推广数据...');
+        
+        const response = await API.request('/api/promotions/overview');
+        if (response.success) {
+            promotionData = response.data;
+            renderOverviewData();
+            renderPromotionProperties();
+            renderRevenueRecords();
+        }
+        
+        Utils.hideLoading();
+    } catch (error) {
+        Utils.hideLoading();
+        Utils.showToast('数据加载失败', 'error');
+    }
+}
+
+// 渲染概览数据
+function renderOverviewData() {
+    if (!promotionData) return;
+    
+    document.getElementById('totalRevenue').textContent = `¥${formatNumber(promotionData.totalRevenue)}`;
+    document.getElementById('monthRevenue').textContent = `¥${formatNumber(promotionData.monthRevenue)}`;
+    document.getElementById('totalViews').textContent = formatNumber(promotionData.totalViews);
+}
+
+// 渲染推广房源
+function renderPromotionProperties() {
+    const container = document.getElementById('promotionProperties');
+    const emptyState = document.getElementById('emptyPromotions');
+    
+    if (!promotionData.properties || promotionData.properties.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    container.style.display = 'block';
+    emptyState.style.display = 'none';
+    
+    container.innerHTML = promotionData.properties.map(property => createPropertyCard(property)).join('');
+}
+
+// 创建房源卡片
+function createPropertyCard(property) {
+    return `
+        <div class="promotion-property-card">
+            <div class="property-image">
+                <img src="${property.image}" alt="${property.title}" onerror="this.src='https://via.placeholder.com/100x80?text=房源'">
+            </div>
+            <div class="property-info">
+                <div class="property-title">${property.title}</div>
+                <div class="property-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-eye"></i>
+                        ${property.views}次浏览
+                    </span>
+                    <span class="stat-item">
+                        <i class="fas fa-comment"></i>
+                        ${property.inquiries}次咨询
+                    </span>
+                </div>
+                <div class="property-revenue">
+                    收益：¥${property.revenue}
+                </div>
+            </div>
+            <div class="property-actions">
+                <button class="action-btn" onclick="viewPropertyStats(${property.id})">
+                    <i class="fas fa-chart-line"></i>
+                    数据
+                </button>
+                <button class="action-btn primary" onclick="shareProperty(${property.id})">
+                    <i class="fas fa-share"></i>
+                    分享
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 渲染收益记录
+function renderRevenueRecords() {
+    const container = document.getElementById('revenueRecords');
+    
+    if (!promotionData.revenueRecords || promotionData.revenueRecords.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 20px;">
+                <div class="icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="title">暂无收益记录</div>
+                <div class="description">完成推广后这里会显示收益明细</div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = promotionData.revenueRecords.map(record => createRevenueRecord(record)).join('');
+}
+
+// 创建收益记录
+function createRevenueRecord(record) {
+    const statusClass = getRevenueStatusClass(record.status);
+    
+    return `
+        <div class="revenue-record">
+            <div class="record-icon">
+                <i class="fas fa-${getRevenueIcon(record.type)}"></i>
+            </div>
+            <div class="record-info">
+                <div class="record-title">${record.title}</div>
+                <div class="record-desc">${record.description}</div>
+                <div class="record-time">${Utils.formatTime(new Date(record.time))}</div>
+            </div>
+            <div class="record-amount">
+                <div class="amount ${record.amount > 0 ? 'positive' : 'negative'}">
+                    ${record.amount > 0 ? '+' : ''}¥${Math.abs(record.amount)}
+                </div>
+                <div class="status ${statusClass}">${record.status}</div>
+            </div>
+        </div>
+    `;
+}
+
+// 获取收益图标
+function getRevenueIcon(type) {
+    const icons = {
+        'commission': 'hand-holding-usd',
+        'bonus': 'gift',
+        'withdrawal': 'money-bill-wave'
+    };
+    return icons[type] || 'coins';
+}
+
+// 获取收益状态样式
+function getRevenueStatusClass(status) {
+    const statusMap = {
+        '已到账': 'success',
+        '处理中': 'warning',
+        '已申请': 'info',
+        '失败': 'error'
+    };
+    return statusMap[status] || 'secondary';
+}
+
+// 格式化数字
+function formatNumber(num) {
+    if (num >= 10000) {
+        return (num / 10000).toFixed(1) + '万';
+    }
+    return num.toLocaleString();
+}
+
+// 添加推广房源
+function addPromotionProperty() {
+    Navigation.goto('../property/index.html?action=promote');
+}
+
+// 查看房源统计
+function viewPropertyStats(propertyId) {
+    Navigation.goto(`stats.html?propertyId=${propertyId}`);
+}
+
+// 分享房源
+function shareProperty(propertyId) {
+    Navigation.goto(`poster.html?propertyId=${propertyId}`);
+}
+
+// 显示帮助
+function showHelp() {
+    Utils.showToast('推广帮助功能开发中', 'info');
+}
+
+// 显示快捷菜单
+function showQuickMenu() {
+    const actions = [
+        { title: '生成海报', icon: 'image', action: () => Navigation.goto('poster.html') },
+        { title: '创建链接', icon: 'link', action: () => Navigation.goto('link.html') },
+        { title: '查看统计', icon: 'chart-bar', action: () => Navigation.goto('stats.html') }
+    ];
+    
+    // 简单的快捷菜单实现
+    Utils.showToast('快捷菜单功能开发中', 'info');
+}
+
+// 扩展API模拟数据
+API.getMockPromotionOverview = function() {
+    return {
+        success: true,
+        data: {
+            totalRevenue: 12580,
+            monthRevenue: 2680,
+            totalViews: 1234,
+            properties: [
+                {
+                    id: 1,
+                    title: '宝安工业园厂房',
+                    image: 'https://via.placeholder.com/100x80?text=厂房1',
+                    views: 156,
+                    inquiries: 12,
+                    revenue: 580
+                },
+                {
+                    id: 2,
+                    title: '松山湖独栋厂房',
+                    image: 'https://via.placeholder.com/100x80?text=厂房2',
+                    views: 89,
+                    inquiries: 5,
+                    revenue: 320
+                }
+            ],
+            revenueRecords: [
+                {
+                    id: 1,
+                    type: 'commission',
+                    title: '推广佣金',
+                    description: '宝安工业园厂房成交佣金',
+                    amount: 2000,
+                    status: '已到账',
+                    time: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 2,
+                    type: 'bonus',
+                    title: '推广奖励',
+                    description: '新客户推广奖励',
+                    amount: 500,
+                    status: '已到账',
+                    time: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 3,
+                    type: 'withdrawal',
+                    title: '提现申请',
+                    description: '申请提现到银行卡',
+                    amount: -1500,
+                    status: '处理中',
+                    time: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+                }
+            ]
+        }
+    };
+};
+
+// 覆盖API调用
+const originalRequest = API.request;
+API.request = function(url, options = {}) {
+    if (url === '/api/promotions/overview') {
+        return Promise.resolve(API.getMockPromotionOverview());
+    }
+    return originalRequest.call(this, url, options);
+};
+
+// 导出函数
+window.addPromotionProperty = addPromotionProperty;
+window.viewPropertyStats = viewPropertyStats;
+window.shareProperty = shareProperty;
+window.showHelp = showHelp;
+window.showQuickMenu = showQuickMenu;
+    </script>
+    
+    <style>
+/* 推广中心页面专用样式 */
+.revenue-overview {
+    position: relative;
+    margin: -16px -16px 16px -16px;
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+}
+
+.revenue-bg {
+    height: 120px;
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.revenue-content {
+    position: relative;
+    padding: 20px 16px 16px;
+    background: var(--bg-primary);
+    margin-top: -40px;
+    border-radius: 16px 16px 0 0;
+}
+
+.revenue-main {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.revenue-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.revenue-amount {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.revenue-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    text-align: center;
+}
+
+.revenue-stat {
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.quick-action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.quick-action-item:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+.action-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.action-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.action-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.promotion-properties {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.promotion-property-card {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    gap: 12px;
+}
+
+.property-image {
+    width: 80px;
+    height: 60px;
+    border-radius: var(--border-radius-small);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.property-info {
+    flex: 1;
+}
+
+.property-title {
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.property-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 4px;
+}
+
+.stat-item {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-item i {
+    font-size: 10px;
+}
+
+.property-revenue {
+    font-size: 12px;
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+.property-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-small);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-btn.primary {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.revenue-records {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.revenue-record {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    gap: 16px;
+}
+
+.record-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.record-info {
+    flex: 1;
+}
+
+.record-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.record-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.record-time {
+    font-size: 11px;
+    color: var(--text-hint);
+}
+
+.record-amount {
+    text-align: right;
+}
+
+.amount {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.amount.positive {
+    color: var(--success-color);
+}
+
+.amount.negative {
+    color: var(--error-color);
+}
+
+.status {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.status.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+}
+
+.status.warning {
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning-color);
+}
+
+.status.info {
+    background: rgba(33, 150, 243, 0.1);
+    color: var(--info-color);
+}
+
+.tips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.tip-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--info-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.tip-content {
+    flex: 1;
+}
+
+.tip-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.tip-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+@media (max-width: 576px) {
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .revenue-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .promotion-property-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .property-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
+    </style>
+</body>
+</html>

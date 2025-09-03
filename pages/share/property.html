@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房源推荐 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="description" content="优质工业厂房推荐，专业地产顾问为您服务">
+    <meta property="og:title" content="房源推荐 - 工业地产SCRM">
+    <meta property="og:description" content="优质工业厂房推荐，专业地产顾问为您服务">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <div class="navbar-brand">
+                    <i class="fas fa-home"></i>
+                    房源详情
+                </div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="shareProperty()">
+                        <i class="fas fa-share"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content" style="padding-bottom: 80px;">
+                <!-- 房源主图展示 -->
+                <div class="property-hero">
+                    <div class="carousel" id="propertyCarousel">
+                        <div class="carousel-inner">
+                            <!-- 图片将通过JavaScript动态加载 -->
+                        </div>
+                        <div class="carousel-indicators" id="carouselIndicators">
+                            <!-- 指示器将通过JavaScript动态生成 -->
+                        </div>
+                        <div class="carousel-controls">
+                            <button class="carousel-prev" onclick="prevImage()">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="carousel-next" onclick="nextImage()">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-actions">
+                        <button class="hero-action" onclick="showVirtualTour()">
+                            <i class="fas fa-cube"></i>
+                            查看全景
+                        </button>
+                        <button class="hero-action" onclick="showVideo()">
+                            <i class="fas fa-play"></i>
+                            观看视频
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 核心卖点 -->
+                <div class="property-highlights">
+                    <h1 class="property-title" id="propertyTitle">深圳宝安稀缺工业厂房</h1>
+                    <div class="highlight-tags">
+                        <span class="highlight-tag price" id="priceHighlight">
+                            <i class="fas fa-money-bill-wave"></i>
+                            80元/㎡
+                        </span>
+                        <span class="highlight-tag area" id="areaHighlight">
+                            <i class="fas fa-ruler-combined"></i>
+                            3000㎡
+                        </span>
+                        <span class="highlight-tag height" id="heightHighlight">
+                            <i class="fas fa-arrows-alt-v"></i>
+                            8米层高
+                        </span>
+                        <span class="highlight-tag load" id="loadHighlight">
+                            <i class="fas fa-weight"></i>
+                            800kg承重
+                        </span>
+                    </div>
+                    <div class="selling-points">
+                        <div class="selling-point">
+                            <i class="fas fa-subway"></i>
+                            <span>地铁直达</span>
+                        </div>
+                        <div class="selling-point">
+                            <i class="fas fa-tools"></i>
+                            <span>配套齐全</span>
+                        </div>
+                        <div class="selling-point">
+                            <i class="fas fa-certificate"></i>
+                            <span>红本产权</span>
+                        </div>
+                        <div class="selling-point">
+                            <i class="fas fa-fire"></i>
+                            <span>消防达标</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详细信息 -->
+                <div class="property-details-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        详细地址
+                    </h2>
+                    <div class="detail-content">
+                        <div class="address" id="propertyAddress">
+                            深圳市宝安区石岩工业园B区
+                        </div>
+                        <button class="map-button" onclick="showMap()">
+                            <i class="fas fa-map"></i>
+                            查看地图
+                        </button>
+                    </div>
+                </div>
+
+                <div class="property-details-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-industry"></i>
+                        厂房配置
+                    </h2>
+                    <div class="detail-content">
+                        <div class="config-list" id="propertyConfig">
+                            <div class="config-item">
+                                <span class="config-label">土地性质：</span>
+                                <span class="config-value">工业用地</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">产权情况：</span>
+                                <span class="config-value">红本产权</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">配电容量：</span>
+                                <span class="config-value">1000KVA</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">消防等级：</span>
+                                <span class="config-value">自动喷淋</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 专属顾问 -->
+                <div class="consultant-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-tie"></i>
+                        专属顾问
+                    </h2>
+                    <div class="consultant-card">
+                        <div class="consultant-avatar">
+                            <img src="https://via.placeholder.com/60x60?text=王" alt="顾问头像" id="consultantAvatar">
+                        </div>
+                        <div class="consultant-info">
+                            <div class="consultant-name" id="consultantName">王销售</div>
+                            <div class="consultant-title" id="consultantTitle">高级置业顾问</div>
+                            <div class="consultant-experience" id="consultantExperience">5年工业地产经验</div>
+                        </div>
+                        <div class="consultant-contact">
+                            <button class="contact-button primary" onclick="callConsultant()">
+                                <i class="fas fa-phone"></i>
+                                立即拨打
+                            </button>
+                            <button class="contact-button" onclick="addWechat()">
+                                <i class="fab fa-weixin"></i>
+                                微信咨询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推广信息 -->
+                <div class="promotion-section">
+                    <div class="promotion-card">
+                        <div class="promotion-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="promotion-content">
+                            <div class="promotion-title">🎁 通过我推荐成交有奖励</div>
+                            <div class="promotion-desc">分享给朋友，成交后可获得丰厚佣金奖励</div>
+                        </div>
+                        <button class="promotion-action" onclick="shareToFriends()">
+                            <i class="fas fa-share"></i>
+                            分享赚佣金
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部固定操作栏 -->
+            <div class="fixed-actions">
+                <button class="action-btn secondary" onclick="saveProperty()">
+                    <i class="fas fa-heart"></i>
+                    收藏
+                </button>
+                <button class="action-btn primary" onclick="callConsultant()">
+                    <i class="fas fa-phone"></i>
+                    立即咨询
+                </button>
+                <button class="action-btn success" onclick="bookViewing()">
+                    <i class="fas fa-calendar"></i>
+                    预约看房
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预约看房模态框 -->
+    <div id="bookingModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">预约看房</h3>
+                <button class="modal-close" onclick="hideBookingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label class="form-label">您的姓名</label>
+                        <input type="text" class="form-control" name="name" placeholder="请输入您的姓名" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">联系电话</label>
+                        <input type="tel" class="form-control" name="phone" placeholder="请输入联系电话" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">公司名称</label>
+                        <input type="text" class="form-control" name="company" placeholder="请输入公司名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">预约时间</label>
+                        <input type="datetime-local" class="form-control" name="datetime" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注说明</label>
+                        <textarea class="form-control" name="note" placeholder="请输入其他需求或备注" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideBookingModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitBooking()">确认预约</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+// 页面数据
+let propertyData = null;
+let currentImageIndex = 0;
+let propertyId = null;
+
+// 页面初始化
+document.addEventListener('DOMContentLoaded', function() {
+    propertyId = Utils.getUrlParam('id') || '1';
+    loadPropertyData();
+    recordPageView();
+});
+
+// 加载房源数据
+async function loadPropertyData() {
+    try {
+        Utils.showLoading('加载房源信息...');
+        
+        const response = await API.request(`/api/properties/${propertyId}`);
+        if (response.success) {
+            propertyData = response.data;
+            renderPropertyData();
+        }
+        
+        Utils.hideLoading();
+    } catch (error) {
+        Utils.hideLoading();
+        Utils.showToast('房源信息加载失败', 'error');
+    }
+}
+
+// 渲染房源数据
+function renderPropertyData() {
+    if (!propertyData) return;
+    
+    // 更新页面标题
+    document.title = `${propertyData.title} - 工业地产SCRM`;
+    
+    // 基本信息
+    document.getElementById('propertyTitle').textContent = propertyData.title;
+    document.getElementById('priceHighlight').innerHTML = `
+        <i class="fas fa-money-bill-wave"></i>
+        ${propertyData.price}${propertyData.type === '出租' ? '元/㎡' : '万'}
+    `;
+    document.getElementById('areaHighlight').innerHTML = `
+        <i class="fas fa-ruler-combined"></i>
+        ${propertyData.area}㎡
+    `;
+    document.getElementById('heightHighlight').innerHTML = `
+        <i class="fas fa-arrows-alt-v"></i>
+        ${propertyData.height}米层高
+    `;
+    document.getElementById('loadHighlight').innerHTML = `
+        <i class="fas fa-weight"></i>
+        ${propertyData.load}kg承重
+    `;
+    
+    document.getElementById('propertyAddress').textContent = propertyData.location;
+    
+    // 轮播图
+    renderImageCarousel();
+    
+    // 顾问信息
+    if (propertyData.consultant) {
+        document.getElementById('consultantName').textContent = propertyData.consultant.name;
+        document.getElementById('consultantTitle').textContent = propertyData.consultant.title;
+        document.getElementById('consultantExperience').textContent = propertyData.consultant.experience;
+    }
+}
+
+// 渲染图片轮播
+function renderImageCarousel() {
+    const images = propertyData.images || [
+        'https://via.placeholder.com/400x300?text=房源图片1',
+        'https://via.placeholder.com/400x300?text=房源图片2',
+        'https://via.placeholder.com/400x300?text=房源图片3'
+    ];
+    
+    const carouselInner = document.querySelector('.carousel-inner');
+    const indicators = document.getElementById('carouselIndicators');
+    
+    carouselInner.innerHTML = images.map((img, index) => `
+        <div class="carousel-item" style="display: ${index === 0 ? 'block' : 'none'}">
+            <img src="${img}" alt="房源图片${index + 1}">
+        </div>
+    `).join('');
+    
+    indicators.innerHTML = images.map((_, index) => `
+        <button class="carousel-indicator ${index === 0 ? 'active' : ''}" onclick="showImage(${index})"></button>
+    `).join('');
+}
+
+// 显示指定图片
+function showImage(index) {
+    const items = document.querySelectorAll('.carousel-item');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    items.forEach((item, i) => {
+        item.style.display = i === index ? 'block' : 'none';
+    });
+    
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+    
+    currentImageIndex = index;
+}
+
+// 上一张图片
+function prevImage() {
+    const totalImages = document.querySelectorAll('.carousel-item').length;
+    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : totalImages - 1;
+    showImage(newIndex);
+}
+
+// 下一张图片
+function nextImage() {
+    const totalImages = document.querySelectorAll('.carousel-item').length;
+    const newIndex = currentImageIndex < totalImages - 1 ? currentImageIndex + 1 : 0;
+    showImage(newIndex);
+}
+
+// 记录页面浏览
+async function recordPageView() {
+    try {
+        await API.request(`/api/properties/${propertyId}/view`, {
+            method: 'POST'
+        });
+    } catch (error) {
+        console.log('记录浏览量失败:', error);
+    }
+}
+
+// 分享房源
+function shareProperty() {
+    if (navigator.share) {
+        navigator.share({
+            title: propertyData.title,
+            text: `推荐一个优质工业厂房：${propertyData.title}`,
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            Utils.showToast('分享链接已复制到剪贴板', 'success');
+        });
+    }
+}
+
+// 拨打顾问电话
+function callConsultant() {
+    const phone = propertyData?.consultant?.phone || '138-1234-5678';
+    window.location.href = `tel:${phone}`;
+}
+
+// 添加微信
+function addWechat() {
+    Utils.showToast('请拨打电话联系顾问获取微信', 'info');
+}
+
+// 收藏房源
+function saveProperty() {
+    Utils.showToast('房源已收藏', 'success');
+}
+
+// 预约看房
+function bookViewing() {
+    document.getElementById('bookingModal').style.display = 'flex';
+}
+
+// 隐藏预约模态框
+function hideBookingModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+}
+
+// 提交预约
+async function submitBooking() {
+    const form = document.getElementById('bookingForm');
+    const formData = new FormData(form);
+    
+    if (!form.checkValidity()) {
+        Utils.showToast('请填写完整信息', 'warning');
+        return;
+    }
+    
+    try {
+        Utils.showLoading('提交预约中...');
+        
+        await API.request('/api/bookings', {
+            method: 'POST',
+            body: JSON.stringify({
+                propertyId: propertyId,
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                company: formData.get('company'),
+                datetime: formData.get('datetime'),
+                note: formData.get('note')
+            })
+        });
+        
+        Utils.hideLoading();
+        Utils.showToast('预约提交成功，顾问将尽快联系您', 'success');
+        hideBookingModal();
+        
+        // 清空表单
+        form.reset();
+        
+    } catch (error) {
+        Utils.hideLoading();
+        Utils.showToast('预约提交失败，请重试', 'error');
+    }
+}
+
+// 分享给朋友
+function shareToFriends() {
+    shareProperty();
+}
+
+// 显示全景
+function showVirtualTour() {
+    Utils.showToast('全景功能开发中', 'info');
+}
+
+// 显示视频
+function showVideo() {
+    Utils.showToast('视频功能开发中', 'info');
+}
+
+// 显示地图
+function showMap() {
+    Utils.showToast('地图功能开发中', 'info');
+}
+
+// 扩展API模拟数据
+const originalGetMockData = API.getMockData;
+API.getMockData = function(url, options) {
+    if (url.includes('/api/properties/') && url.includes('/view')) {
+        return { success: true, message: '浏览记录成功' };
+    }
+    
+    if (url.includes('/api/bookings') && options.method === 'POST') {
+        return { success: true, message: '预约提交成功' };
+    }
+    
+    if (url.match(/\/api\/properties\/\d+$/)) {
+        return {
+            success: true,
+            data: {
+                id: 1,
+                title: '深圳宝安稀缺工业厂房',
+                location: '深圳市宝安区石岩工业园B区',
+                price: 80,
+                area: 3000,
+                height: 8,
+                load: 800,
+                type: '出租',
+                images: [
+                    'https://via.placeholder.com/400x300?text=厂房外观',
+                    'https://via.placeholder.com/400x300?text=厂房内部',
+                    'https://via.placeholder.com/400x300?text=周边环境'
+                ],
+                consultant: {
+                    name: '王销售',
+                    title: '高级置业顾问',
+                    experience: '5年工业地产经验',
+                    phone: '138-1234-5678'
+                }
+            }
+        };
+    }
+    
+    return originalGetMockData.call(this, url, options);
+};
+
+// 导出函数
+window.showImage = showImage;
+window.prevImage = prevImage;
+window.nextImage = nextImage;
+window.shareProperty = shareProperty;
+window.callConsultant = callConsultant;
+window.addWechat = addWechat;
+window.saveProperty = saveProperty;
+window.bookViewing = bookViewing;
+window.hideBookingModal = hideBookingModal;
+window.submitBooking = submitBooking;
+window.shareToFriends = shareToFriends;
+window.showVirtualTour = showVirtualTour;
+window.showVideo = showVideo;
+window.showMap = showMap;
+    </script>
+    
+    <style>
+/* H5分享页面专用样式 */
+.property-hero {
+    position: relative;
+    margin: -16px -16px 16px -16px;
+}
+
+.hero-actions {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+.hero-action {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.property-highlights {
+    margin-bottom: 24px;
+}
+
+.property-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.highlight-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.highlight-tag {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.highlight-tag.price {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.highlight-tag.area {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+}
+
+.highlight-tag.height {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.highlight-tag.load {
+    background: rgba(156, 39, 176, 0.1);
+    color: #9c27b0;
+}
+
+.selling-points {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.selling-point {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.selling-point i {
+    color: var(--success-color);
+    width: 16px;
+}
+
+.property-details-section {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.section-title i {
+    color: var(--primary-color);
+}
+
+.detail-content {
+    background: var(--bg-card);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.address {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.map-button {
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.config-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.config-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.config-item:last-child {
+    border-bottom: none;
+}
+
+.config-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.config-value {
+    color: var(--text-primary);
+}
+
+.consultant-section {
+    margin-bottom: 24px;
+}
+
+.consultant-card {
+    background: var(--bg-card);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.consultant-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.consultant-info {
+    flex: 1;
+}
+
+.consultant-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.consultant-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.consultant-experience {
+    font-size: 12px;
+    color: var(--text-hint);
+}
+
+.consultant-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.contact-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.contact-button.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.contact-button {
+    background: var(--success-color);
+    color: white;
+}
+
+.promotion-section {
+    margin-bottom: 24px;
+}
+
+.promotion-card {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.promotion-icon {
+    font-size: 24px;
+}
+
+.promotion-content {
+    flex: 1;
+}
+
+.promotion-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.promotion-desc {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.promotion-action {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fixed-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    padding: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.action-btn.secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.action-btn.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-btn.success {
+    background: var(--success-color);
+    color: white;
+}
+
+@media (max-width: 576px) {
+    .consultant-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .consultant-contact {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .selling-points {
+        grid-template-columns: 1fr;
+    }
+    
+    .highlight-tags {
+        justify-content: center;
+    }
+}
+    </style>
+</body>
+</html>

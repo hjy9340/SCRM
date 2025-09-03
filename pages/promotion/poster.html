@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成海报 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .poster-generator {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 60px);
+        }
+        
+        .generator-header {
+            background: var(--bg-primary);
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .generator-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .generator-sidebar {
+            width: 320px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        
+        .generator-main {
+            flex: 1;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+        
+        .poster-canvas {
+            width: 375px;
+            height: 600px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .template-section {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .template-item {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-card);
+        }
+        
+        .template-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .template-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+        
+        .template-preview {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+        }
+        
+        .template-name {
+            padding: var(--spacing-xs);
+            text-align: center;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+        }
+        
+        .property-form {
+            padding: var(--spacing-md);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .poster-header {
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .poster-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .poster-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .poster-image {
+            height: 200px;
+            background: url('https://via.placeholder.com/375x200?text=房源图片') center/cover;
+            position: relative;
+        }
+        
+        .poster-badge {
+            position: absolute;
+            top: var(--spacing-sm);
+            left: var(--spacing-sm);
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .poster-content {
+            padding: var(--spacing-lg);
+        }
+        
+        .property-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+        
+        .property-location {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .property-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .detail-item {
+            text-align: center;
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-small);
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .poster-qr {
+            text-align: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .qr-code {
+            width: 60px;
+            height: 60px;
+            background: url('https://via.placeholder.com/60x60?text=QR') center/contain no-repeat;
+            margin: 0 auto var(--spacing-xs);
+        }
+        
+        .qr-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        @media (max-width: 768px) {
+            .generator-content {
+                flex-direction: column;
+            }
+            
+            .generator-sidebar {
+                width: 100%;
+                height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .poster-canvas {
+                width: 300px;
+                height: 480px;
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">生成海报</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="showHelp()">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 海报生成器 -->
+            <div class="poster-generator">
+                <div class="generator-header">
+                    <div class="title">海报编辑器</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary btn-small" onclick="resetPoster()">
+                            <i class="fas fa-undo"></i>
+                            重置
+                        </button>
+                        <button class="btn btn-primary btn-small" onclick="generatePoster()">
+                            <i class="fas fa-download"></i>
+                            生成海报
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="generator-content">
+                    <!-- 左侧编辑区 -->
+                    <div class="generator-sidebar">
+                        <!-- 模板选择 -->
+                        <div class="template-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-palette"></i>
+                                选择模板
+                            </h3>
+                            <div class="template-grid">
+                                <div class="template-item active" data-template="business" onclick="selectTemplate('business')">
+                                    <div class="template-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        商务风格
+                                    </div>
+                                    <div class="template-name">商务风格</div>
+                                </div>
+                                <div class="template-item" data-template="modern" onclick="selectTemplate('modern')">
+                                    <div class="template-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                        现代简约
+                                    </div>
+                                    <div class="template-name">现代简约</div>
+                                </div>
+                                <div class="template-item" data-template="industrial" onclick="selectTemplate('industrial')">
+                                    <div class="template-preview" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                        工业风格
+                                    </div>
+                                    <div class="template-name">工业风格</div>
+                                </div>
+                                <div class="template-item" data-template="luxury" onclick="selectTemplate('luxury')">
+                                    <div class="template-preview" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                        高端奢华
+                                    </div>
+                                    <div class="template-name">高端奢华</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 房源信息 -->
+                        <div class="template-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-building"></i>
+                                房源信息
+                            </h3>
+                            <form class="property-form">
+                                <div class="form-group">
+                                    <label class="form-label">房源名称</label>
+                                    <input type="text" class="form-control" id="propertyName" value="宝安工业园A栋厂房" onchange="updatePoster()">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">位置地址</label>
+                                    <input type="text" class="form-control" id="propertyLocation" value="深圳市宝安区新安街道" onchange="updatePoster()">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">面积</label>
+                                        <input type="text" class="form-control" id="propertyArea" value="2000㎡" onchange="updatePoster()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">层高</label>
+                                        <input type="text" class="form-control" id="propertyHeight" value="6米" onchange="updatePoster()">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">承重</label>
+                                        <input type="text" class="form-control" id="propertyLoad" value="500kg/㎡" onchange="updatePoster()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">价格</label>
+                                        <input type="text" class="form-control" id="propertyPrice" value="¥25/㎡/月" onchange="updatePoster()">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">房源类型</label>
+                                    <select class="form-control" id="propertyType" onchange="updatePoster()">
+                                        <option value="出租">出租</option>
+                                        <option value="出售">出售</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">房源图片</label>
+                                    <input type="file" class="form-control" id="propertyImage" accept="image/*" onchange="handleImageUpload(this)">
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- 联系信息 -->
+                        <div class="template-section">
+                            <h3 class="section-title">
+                                <i class="fas fa-user"></i>
+                                联系信息
+                            </h3>
+                            <form class="property-form">
+                                <div class="form-group">
+                                    <label class="form-label">经纪人姓名</label>
+                                    <input type="text" class="form-control" id="agentName" value="王经理" onchange="updatePoster()">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">联系电话</label>
+                                    <input type="text" class="form-control" id="agentPhone" value="138-1234-5678" onchange="updatePoster()">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">公司名称</label>
+                                    <input type="text" class="form-control" id="companyName" value="深圳XX地产" onchange="updatePoster()">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧预览区 -->
+                    <div class="generator-main">
+                        <div class="poster-canvas" id="posterCanvas">
+                            <!-- 海报头部 -->
+                            <div class="poster-header" id="posterHeader">
+                                <div class="poster-title" id="posterTitle">优质工业厂房</div>
+                                <div class="poster-subtitle" id="posterSubtitle">专业推荐 · 品质保证</div>
+                            </div>
+                            
+                            <!-- 房源图片 -->
+                            <div class="poster-image" id="posterImage">
+                                <div class="poster-badge" id="posterBadge">出租</div>
+                            </div>
+                            
+                            <!-- 海报内容 -->
+                            <div class="poster-content">
+                                <div class="property-name" id="previewPropertyName">宝安工业园A栋厂房</div>
+                                <div class="property-location" id="previewPropertyLocation">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    深圳市宝安区新安街道
+                                </div>
+                                
+                                <div class="property-details">
+                                    <div class="detail-item">
+                                        <div class="detail-value" id="previewArea">2000</div>
+                                        <div class="detail-label">面积(㎡)</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value" id="previewHeight">6</div>
+                                        <div class="detail-label">层高(米)</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value" id="previewLoad">500</div>
+                                        <div class="detail-label">承重(kg/㎡)</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value" id="previewPrice">¥25</div>
+                                        <div class="detail-label">价格(/㎡/月)</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="poster-qr">
+                                    <div class="qr-code"></div>
+                                    <div class="qr-text">扫码了解详情</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let currentTemplate = 'business';
+        
+        // 模板配置
+        const templates = {
+            business: {
+                name: '商务风格',
+                headerBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                primaryColor: '#667eea',
+                title: '优质工业厂房',
+                subtitle: '专业推荐 · 品质保证'
+            },
+            modern: {
+                name: '现代简约',
+                headerBg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                primaryColor: '#f093fb',
+                title: '精选工业空间',
+                subtitle: '现代设计 · 高效办公'
+            },
+            industrial: {
+                name: '工业风格',
+                headerBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                primaryColor: '#4facfe',
+                title: '工业厂房直租',
+                subtitle: '实力保障 · 价格实惠'
+            },
+            luxury: {
+                name: '高端奢华',
+                headerBg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                primaryColor: '#fa709a',
+                title: '高端产业园区',
+                subtitle: '奢华配套 · 尊享服务'
+            }
+        };
+        
+        // 选择模板
+        function selectTemplate(templateId) {
+            currentTemplate = templateId;
+            
+            // 更新模板选中状态
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-template="${templateId}"]`).classList.add('active');
+            
+            // 应用模板样式
+            applyTemplate(templates[templateId]);
+        }
+        
+        // 应用模板
+        function applyTemplate(template) {
+            const header = document.getElementById('posterHeader');
+            const title = document.getElementById('posterTitle');
+            const subtitle = document.getElementById('posterSubtitle');
+            
+            header.style.background = template.headerBg;
+            title.textContent = template.title;
+            subtitle.textContent = template.subtitle;
+            
+            // 更新主色调
+            document.documentElement.style.setProperty('--poster-primary', template.primaryColor);
+        }
+        
+        // 更新海报内容
+        function updatePoster() {
+            const propertyName = document.getElementById('propertyName').value;
+            const propertyLocation = document.getElementById('propertyLocation').value;
+            const propertyArea = document.getElementById('propertyArea').value;
+            const propertyHeight = document.getElementById('propertyHeight').value;
+            const propertyLoad = document.getElementById('propertyLoad').value;
+            const propertyPrice = document.getElementById('propertyPrice').value;
+            const propertyType = document.getElementById('propertyType').value;
+            
+            // 更新预览
+            document.getElementById('previewPropertyName').textContent = propertyName;
+            document.getElementById('previewPropertyLocation').innerHTML = `
+                <i class="fas fa-map-marker-alt"></i>
+                ${propertyLocation}
+            `;
+            
+            // 提取数字部分
+            document.getElementById('previewArea').textContent = propertyArea.replace(/[^\d]/g, '');
+            document.getElementById('previewHeight').textContent = propertyHeight.replace(/[^\d]/g, '');
+            document.getElementById('previewLoad').textContent = propertyLoad.replace(/[^\d]/g, '');
+            document.getElementById('previewPrice').textContent = propertyPrice;
+            
+            // 更新徽章
+            document.getElementById('posterBadge').textContent = propertyType;
+        }
+        
+        // 处理图片上传
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('posterImage').style.backgroundImage = `url(${e.target.result})`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // 重置海报
+        function resetPoster() {
+            Utils.showConfirm('确定要重置海报吗？所有修改将丢失。', (confirmed) => {
+                if (confirmed) {
+                    // 重置表单
+                    document.querySelectorAll('input, select').forEach(input => {
+                        if (input.type !== 'file') {
+                            input.value = input.defaultValue || '';
+                        }
+                    });
+                    
+                    // 重置模板
+                    selectTemplate('business');
+                    updatePoster();
+                    
+                    Utils.showToast('海报已重置', 'success');
+                }
+            });
+        }
+        
+        // 生成海报
+        function generatePoster() {
+            Utils.showLoading('正在生成海报...');
+            
+            // 模拟海报生成过程
+            setTimeout(() => {
+                Utils.hideLoading();
+                
+                // 显示生成结果
+                Utils.showModal({
+                    title: '海报生成成功',
+                    content: `
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle text-success" style="font-size: 48px;"></i>
+                            </div>
+                            <p>海报已成功生成！</p>
+                            <div class="mt-3">
+                                <button class="btn btn-primary mr-2" onclick="downloadPoster()">
+                                    <i class="fas fa-download"></i>
+                                    下载海报
+                                </button>
+                                <button class="btn btn-secondary" onclick="sharePoster()">
+                                    <i class="fas fa-share"></i>
+                                    分享海报
+                                </button>
+                            </div>
+                        </div>
+                    `,
+                    footer: false
+                });
+            }, 2000);
+        }
+        
+        // 下载海报
+        function downloadPoster() {
+            // 实际项目中这里会调用html2canvas等库生成图片
+            Utils.showToast('海报下载功能开发中', 'info');
+        }
+        
+        // 分享海报
+        function sharePoster() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '房源推广海报',
+                    text: '优质工业厂房推荐',
+                    files: [/* 海报文件 */]
+                });
+            } else {
+                Utils.showToast('海报分享功能开发中', 'info');
+            }
+        }
+        
+        // 显示帮助
+        function showHelp() {
+            Utils.showModal({
+                title: '海报生成帮助',
+                content: `
+                    <div class="help-content">
+                        <h4>使用说明：</h4>
+                        <ol>
+                            <li>选择合适的海报模板风格</li>
+                            <li>填写房源基本信息和联系方式</li>
+                            <li>上传房源图片（可选）</li>
+                            <li>预览海报效果</li>
+                            <li>生成并下载或分享海报</li>
+                        </ol>
+                        
+                        <h4>注意事项：</h4>
+                        <ul>
+                            <li>建议上传高清房源图片</li>
+                            <li>确保联系信息准确无误</li>
+                            <li>选择适合的模板风格</li>
+                            <li>定期更新海报内容</li>
+                        </ul>
+                    </div>
+                `,
+                size: 'large'
+            });
+        }
+        
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 应用默认模板
+            applyTemplate(templates[currentTemplate]);
+            updatePoster();
+        });
+        
+        // 导出函数供全局使用
+        window.selectTemplate = selectTemplate;
+        window.updatePoster = updatePoster;
+        window.handleImageUpload = handleImageUpload;
+        window.resetPoster = resetPoster;
+        window.generatePoster = generatePoster;
+        window.downloadPoster = downloadPoster;
+        window.sharePoster = sharePoster;
+        window.showHelp = showHelp;
+    </script>
+</body>
+</html>

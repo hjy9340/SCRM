@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推广数据分析 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .analytics-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: var(--spacing-lg);
+        }
+        
+        .period-selector {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            justify-content: center;
+        }
+        
+        .period-btn {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+        
+        .period-btn.active {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .overview-stat {
+            background: rgba(255, 255, 255, 0.15);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+        
+        .stat-number {
+            font-size: var(--font-size-xl);
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .chart-section {
+            background: white;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-lg);
+        }
+        
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .chart-container {
+            height: 300px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 200px;
+            width: 100%;
+            padding: var(--spacing-md);
+        }
+        
+        .chart-bar {
+            width: 30px;
+            background: linear-gradient(to top, var(--primary-color), var(--primary-light));
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .funnel-chart {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+        }
+        
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .funnel-bar {
+            flex: 1;
+            height: 40px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .funnel-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .export-section {
+            background: white;
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .overview-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">推广数据分析</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 数据概览 -->
+            <div class="analytics-header">
+                <div class="period-selector">
+                    <button class="period-btn" onclick="changePeriod('7d', this)">7天</button>
+                    <button class="period-btn active" onclick="changePeriod('30d', this)">30天</button>
+                    <button class="period-btn" onclick="changePeriod('90d', this)">90天</button>
+                </div>
+                
+                <div class="overview-stats">
+                    <div class="overview-stat">
+                        <div class="stat-number">1,234</div>
+                        <div class="stat-label">总分享次数</div>
+                    </div>
+                    <div class="overview-stat">
+                        <div class="stat-number">8,756</div>
+                        <div class="stat-label">总浏览量</div>
+                    </div>
+                    <div class="overview-stat">
+                        <div class="stat-number">342</div>
+                        <div class="stat-label">总咨询量</div>
+                    </div>
+                    <div class="overview-stat">
+                        <div class="stat-number">3.9%</div>
+                        <div class="stat-label">转化率</div>
+                    </div>
+                    <div class="overview-stat">
+                        <div class="stat-number">¥48.5K</div>
+                        <div class="stat-label">总佣金</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 趋势图表 -->
+                <div class="chart-section">
+                    <h3 class="chart-title">推广效果趋势</h3>
+                    <div class="chart-container">
+                        <div class="chart-bars">
+                            <div class="chart-bar" style="height: 60%;"></div>
+                            <div class="chart-bar" style="height: 80%;"></div>
+                            <div class="chart-bar" style="height: 45%;"></div>
+                            <div class="chart-bar" style="height: 90%;"></div>
+                            <div class="chart-bar" style="height: 75%;"></div>
+                            <div class="chart-bar" style="height: 100%;"></div>
+                            <div class="chart-bar" style="height: 85%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 转化漏斗 -->
+                <div class="chart-section">
+                    <h3 class="chart-title">转化漏斗分析</h3>
+                    <div class="chart-container">
+                        <div class="funnel-chart">
+                            <div class="funnel-stage">
+                                <div style="min-width: 100px;">分享展示</div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill" style="width: 100%;">8,756</div>
+                                </div>
+                                <div style="min-width: 60px;">100%</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div style="min-width: 100px;">点击浏览</div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill" style="width: 45%;">3,940</div>
+                                </div>
+                                <div style="min-width: 60px;">45%</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div style="min-width: 100px;">留言咨询</div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill" style="width: 8%;">702</div>
+                                </div>
+                                <div style="min-width: 60px;">8%</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div style="min-width: 100px;">电话咨询</div>
+                                <div class="funnel-bar">
+                                    <div class="funnel-fill" style="width: 4%;">342</div>
+                                </div>
+                                <div style="min-width: 60px;">4%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 导出数据 -->
+                <div class="export-section">
+                    <h3 style="margin-bottom: var(--spacing-lg);">数据导出</h3>
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="exportData('excel')">
+                            <i class="fas fa-file-excel"></i>
+                            导出Excel
+                        </button>
+                        <button class="export-btn" onclick="exportData('pdf')">
+                            <i class="fas fa-file-pdf"></i>
+                            导出PDF
+                        </button>
+                        <button class="export-btn" onclick="exportData('image')">
+                            <i class="fas fa-image"></i>
+                            导出图片
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        function changePeriod(period, element) {
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            showToast(`切换到${period}数据`, 'success');
+        }
+
+        function refreshData() {
+            showToast('数据刷新完成', 'success');
+        }
+
+        function exportData(format) {
+            const formats = {
+                excel: 'Excel文件',
+                pdf: 'PDF报告',
+                image: '图片文件'
+            };
+            showToast(`${formats[format]}导出成功！`, 'success');
+        }
+    </script>
+</body>
+</html>

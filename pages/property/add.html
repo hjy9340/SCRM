@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布房源 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .publish-steps {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -50%;
+            top: 15px;
+            width: 100%;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+        
+        .step-item.active::after {
+            background: var(--primary-color);
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin: 0 auto var(--spacing-xs);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-item.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .step-item.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .step-title {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .step-item.active .step-title {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .form-section {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+        
+        .location-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .price-input {
+            flex: 1;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            outline: none;
+        }
+        
+        .price-unit {
+            background: var(--bg-secondary);
+            padding: var(--spacing-sm) var(--spacing-md);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            border-left: 1px solid var(--border-color);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .feature-checkbox {
+            margin: 0;
+        }
+        
+        .feature-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+        }
+        
+        .image-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .image-upload-item {
+            aspect-ratio: 1;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-upload-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .image-upload-item.has-image {
+            border-style: solid;
+            border-color: var(--success-color);
+        }
+        
+        .upload-icon {
+            font-size: 24px;
+            color: var(--text-hint);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .upload-text {
+            font-size: var(--font-size-sm);
+            color: var(--text-hint);
+            text-align: center;
+        }
+        
+        .uploaded-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .image-actions {
+            position: absolute;
+            top: var(--spacing-xs);
+            right: var(--spacing-xs);
+            display: flex;
+            gap: var(--spacing-xs);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .image-upload-item:hover .image-actions {
+            opacity: 1;
+        }
+        
+        .image-action {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .publish-actions {
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-primary);
+            padding: var(--spacing-md);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .action-secondary {
+            flex: 1;
+        }
+        
+        .action-primary {
+            flex: 2;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row, .form-row-3, .location-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-upload-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="confirmExit()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">发布房源</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="saveDraft()">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 发布步骤 -->
+            <div class="publish-steps">
+                <div class="step-item active" data-step="1">
+                    <div>
+                        <div class="step-number">1</div>
+                        <div class="step-title">基本信息</div>
+                    </div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div>
+                        <div class="step-number">2</div>
+                        <div class="step-title">详细参数</div>
+                    </div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div>
+                        <div class="step-number">3</div>
+                        <div class="step-title">图片上传</div>
+                    </div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div>
+                        <div class="step-number">4</div>
+                        <div class="step-title">发布确认</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <form id="propertyForm" onsubmit="submitProperty(event)">
+                    <!-- 基本信息 -->
+                    <div class="form-section" id="section1">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle text-primary"></i>
+                            基本信息
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">房源标题 *</label>
+                            <input type="text" class="form-control" name="title" placeholder="请输入房源标题，如：宝安工业园A栋厂房" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">房源类型 *</label>
+                            <select class="form-control" name="type" required onchange="updatePriceUnit()">
+                                <option value="">请选择房源类型</option>
+                                <option value="rent">出租</option>
+                                <option value="sale">出售</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">所在地区 *</label>
+                            <div class="location-selector">
+                                <select class="form-control" name="province" required>
+                                    <option value="">省份</option>
+                                    <option value="guangdong">广东省</option>
+                                    <option value="jiangsu">江苏省</option>
+                                    <option value="zhejiang">浙江省</option>
+                                </select>
+                                <select class="form-control" name="city" required>
+                                    <option value="">城市</option>
+                                    <option value="shenzhen">深圳市</option>
+                                    <option value="guangzhou">广州市</option>
+                                    <option value="dongguan">东莞市</option>
+                                </select>
+                                <select class="form-control" name="district" required>
+                                    <option value="">区县</option>
+                                    <option value="nanshan">南山区</option>
+                                    <option value="futian">福田区</option>
+                                    <option value="baoan">宝安区</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">详细地址 *</label>
+                            <input type="text" class="form-control" name="address" placeholder="请输入详细地址" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">建筑面积 *</label>
+                                <div class="price-input-group">
+                                    <input type="number" class="price-input" name="area" placeholder="请输入面积" required>
+                                    <div class="price-unit">㎡</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">价格 *</label>
+                                <div class="price-input-group">
+                                    <input type="number" class="price-input" name="price" placeholder="请输入价格" required>
+                                    <div class="price-unit" id="priceUnit">元</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 详细参数 -->
+                    <div class="form-section" id="section2" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-ruler-combined text-info"></i>
+                            详细参数
+                        </h3>
+                        
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label class="form-label">层高</label>
+                                <div class="price-input-group">
+                                    <input type="number" class="price-input" name="height" placeholder="层高" step="0.1">
+                                    <div class="price-unit">米</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">承重</label>
+                                <div class="price-input-group">
+                                    <input type="number" class="price-input" name="load" placeholder="承重">
+                                    <div class="price-unit">kg/㎡</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">楼层</label>
+                                <input type="text" class="form-control" name="floor" placeholder="如：1-3层">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">建成年份</label>
+                                <input type="number" class="form-control" name="buildYear" placeholder="如：2018" min="1980" max="2024">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">装修情况</label>
+                                <select class="form-control" name="decoration">
+                                    <option value="">请选择</option>
+                                    <option value="rough">毛坯</option>
+                                    <option value="simple">简装</option>
+                                    <option value="fine">精装</option>
+                                    <option value="luxury">豪装</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">配套设施</label>
+                            <div class="feature-grid">
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="parking" id="parking">
+                                    <label class="feature-label" for="parking">停车场</label>
+                                </div>
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="elevator" id="elevator">
+                                    <label class="feature-label" for="elevator">货梯</label>
+                                </div>
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="office" id="office">
+                                    <label class="feature-label" for="office">办公区</label>
+                                </div>
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="dormitory" id="dormitory">
+                                    <label class="feature-label" for="dormitory">员工宿舍</label>
+                                </div>
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="canteen" id="canteen">
+                                    <label class="feature-label" for="canteen">员工食堂</label>
+                                </div>
+                                <div class="feature-item">
+                                    <input type="checkbox" class="feature-checkbox" name="features" value="security" id="security">
+                                    <label class="feature-label" for="security">24小时保安</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">房源描述</label>
+                            <textarea class="form-control" name="description" rows="4" placeholder="请详细描述房源特点、周边环境、交通情况等..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 图片上传 -->
+                    <div class="form-section" id="section3" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-camera text-warning"></i>
+                            房源图片
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">上传图片（最多9张）</label>
+                            <div class="image-upload-grid" id="imageUploadGrid">
+                                <!-- 图片上传区域将通过JavaScript动态生成 -->
+                            </div>
+                            <p class="text-secondary mt-2" style="font-size: var(--font-size-sm);">
+                                建议上传清晰的房源照片，包括外观、内部空间、配套设施等
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 发布确认 -->
+                    <div class="form-section" id="section4" style="display: none;">
+                        <h3 class="section-title">
+                            <i class="fas fa-check-circle text-success"></i>
+                            发布确认
+                        </h3>
+                        
+                        <div id="propertyPreview">
+                            <!-- 房源预览将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="feature-item">
+                                <input type="checkbox" id="agreeTerms" required>
+                                <label for="agreeTerms" class="feature-label">
+                                    我已阅读并同意 <a href="#" class="text-primary">《房源发布协议》</a>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </main>
+
+            <!-- 底部操作按钮 -->
+            <div class="publish-actions">
+                <button type="button" class="btn btn-secondary action-secondary" id="prevBtn" onclick="prevStep()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                    上一步
+                </button>
+                <button type="button" class="btn btn-primary action-primary" id="nextBtn" onclick="nextStep()">
+                    下一步
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <button type="submit" class="btn btn-success action-primary" id="submitBtn" style="display: none;" form="propertyForm">
+                    <i class="fas fa-upload"></i>
+                    发布房源
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="imageInput" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(this)">
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let currentStep = 1;
+        let uploadedImages = [];
+        const maxImages = 9;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initImageUpload();
+        });
+        
+        // 初始化图片上传区域
+        function initImageUpload() {
+            const grid = document.getElementById('imageUploadGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < maxImages; i++) {
+                const item = document.createElement('div');
+                item.className = 'image-upload-item';
+                item.onclick = () => triggerImageUpload(i);
+                
+                if (i < uploadedImages.length) {
+                    item.classList.add('has-image');
+                    item.innerHTML = `
+                        <img src="${uploadedImages[i].url}" alt="房源图片" class="uploaded-image">
+                        <div class="image-actions">
+                            <button type="button" class="image-action" onclick="event.stopPropagation(); previewImage(${i})" title="预览">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="image-action" onclick="event.stopPropagation(); removeImage(${i})" title="删除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    item.innerHTML = `
+                        <div class="upload-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="upload-text">添加图片</div>
+                    `;
+                }
+            }
+        }
+        
+        // 触发图片上传
+        function triggerImageUpload(index) {
+            if (index < uploadedImages.length) return;
+            document.getElementById('imageInput').click();
+        }
+        
+        // 处理图片上传
+        function handleImageUpload(input) {
+            const files = Array.from(input.files);
+            
+            files.forEach(file => {
+                if (uploadedImages.length >= maxImages) {
+                    Utils.showToast('最多只能上传9张图片', 'warning');
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    Utils.showToast('请选择图片文件', 'warning');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    Utils.showToast('图片大小不能超过5MB', 'warning');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push({
+                        file: file,
+                        url: e.target.result,
+                        name: file.name
+                    });
+                    initImageUpload();
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            input.value = '';
+        }
+        
+        // 移除图片
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            initImageUpload();
+        }
+        
+        // 预览图片
+        function previewImage(index) {
+            const image = uploadedImages[index];
+            Utils.showModal({
+                title: '图片预览',
+                content: `
+                    <div class="text-center">
+                        <img src="${image.url}" style="max-width: 100%; max-height: 400px;" alt="预览">
+                        <p class="mt-2 text-secondary">${image.name}</p>
+                    </div>
+                `,
+                size: 'large'
+            });
+        }
+        
+        // 更新价格单位
+        function updatePriceUnit() {
+            const typeSelect = document.querySelector('select[name="type"]');
+            const priceUnit = document.getElementById('priceUnit');
+            
+            if (typeSelect.value === 'rent') {
+                priceUnit.textContent = '元/㎡/月';
+            } else if (typeSelect.value === 'sale') {
+                priceUnit.textContent = '万元';
+            } else {
+                priceUnit.textContent = '元';
+            }
+        }
+        
+        // 下一步
+        function nextStep() {
+            if (!validateCurrentStep()) return;
+            
+            if (currentStep < 4) {
+                currentStep++;
+                updateStepDisplay();
+                
+                if (currentStep === 4) {
+                    generatePreview();
+                }
+            }
+        }
+        
+        // 上一步
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+        
+        // 更新步骤显示
+        function updateStepDisplay() {
+            document.querySelectorAll('.step-item').forEach((item, index) => {
+                item.classList.remove('active', 'completed');
+                const stepNum = index + 1;
+                
+                if (stepNum < currentStep) {
+                    item.classList.add('completed');
+                    item.querySelector('.step-number').innerHTML = '<i class="fas fa-check"></i>';
+                } else if (stepNum === currentStep) {
+                    item.classList.add('active');
+                    item.querySelector('.step-number').textContent = stepNum;
+                } else {
+                    item.querySelector('.step-number').textContent = stepNum;
+                }
+            });
+            
+            document.querySelectorAll('.form-section').forEach((section, index) => {
+                section.style.display = index + 1 === currentStep ? 'block' : 'none';
+            });
+            
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            prevBtn.style.display = currentStep > 1 ? 'block' : 'none';
+            
+            if (currentStep === 4) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+        
+        // 验证当前步骤
+        function validateCurrentStep() {
+            const currentSection = document.getElementById(`section${currentStep}`);
+            const requiredFields = currentSection.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    Utils.showToast('请填写必填项', 'warning');
+                    return false;
+                }
+            }
+            
+            if (currentStep === 3 && uploadedImages.length === 0) {
+                Utils.showToast('请至少上传一张房源图片', 'warning');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // 生成预览
+        function generatePreview() {
+            const form = document.getElementById('propertyForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            const features = form.querySelectorAll('input[name="features"]:checked');
+            const featureList = Array.from(features).map(f => f.nextElementSibling.textContent);
+            
+            const preview = document.getElementById('propertyPreview');
+            preview.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h4>${data.title || '未填写'}</h4>
+                        <p class="text-secondary">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            ${data.address || '未填写'}
+                        </p>
+                        
+                        <div class="mt-3">
+                            <strong>基本信息：</strong><br>
+                            类型：${data.type === 'rent' ? '出租' : data.type === 'sale' ? '出售' : '未选择'} | 
+                            面积：${data.area || '0'}㎡ | 
+                            价格：${data.price || '0'}${data.type === 'rent' ? '元/㎡/月' : data.type === 'sale' ? '万元' : '元'}
+                        </div>
+                        
+                        ${data.height || data.load || data.floor ? `
+                            <div class="mt-2">
+                                <strong>详细参数：</strong><br>
+                                ${data.height ? `层高：${data.height}米 ` : ''}
+                                ${data.load ? `承重：${data.load}kg/㎡ ` : ''}
+                                ${data.floor ? `楼层：${data.floor}` : ''}
+                            </div>
+                        ` : ''}
+                        
+                        ${featureList.length > 0 ? `
+                            <div class="mt-2">
+                                <strong>配套设施：</strong>${featureList.join('、')}
+                            </div>
+                        ` : ''}
+                        
+                        ${data.description ? `
+                            <div class="mt-2">
+                                <strong>房源描述：</strong><br>
+                                ${data.description}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="mt-2">
+                            <strong>房源图片：</strong>已上传${uploadedImages.length}张图片
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 提交房源
+        function submitProperty(event) {
+            event.preventDefault();
+            
+            if (!document.getElementById('agreeTerms').checked) {
+                Utils.showToast('请同意房源发布协议', 'warning');
+                return;
+            }
+            
+            Utils.showLoading('正在发布房源...');
+            
+            setTimeout(() => {
+                Utils.hideLoading();
+                Utils.showToast('房源发布成功！', 'success');
+                
+                setTimeout(() => {
+                    Navigation.goto('index.html');
+                }, 1500);
+            }, 2000);
+        }
+        
+        // 保存草稿
+        function saveDraft() {
+            Utils.showToast('草稿保存成功', 'success');
+        }
+        
+        // 确认退出
+        function confirmExit() {
+            Utils.showConfirm('确定要退出吗？未保存的内容将丢失。', (confirmed) => {
+                if (confirmed) {
+                    Navigation.back();
+                }
+            });
+        }
+        
+        // 导出函数供全局使用
+        window.nextStep = nextStep;
+        window.prevStep = prevStep;
+        window.handleImageUpload = handleImageUpload;
+        window.submitProperty = submitProperty;
+        window.updatePriceUnit = updatePriceUnit;
+        window.saveDraft = saveDraft;
+        window.confirmExit = confirmExit;
+        window.removeImage = removeImage;
+        window.previewImage = previewImage;
+    </script>
+</body>
+</html>

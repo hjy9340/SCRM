@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推广统计 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .stats-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+        
+        .stats-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stats-subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .time-filter {
+            padding: var(--spacing-md);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            overflow-x: auto;
+            padding-bottom: var(--spacing-xs);
+        }
+        
+        .filter-tab {
+            flex-shrink: 0;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+        
+        .overview-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .overview-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-sm);
+            font-size: 20px;
+            color: white;
+        }
+        
+        .overview-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .overview-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .overview-change {
+            font-size: var(--font-size-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .change-positive {
+            color: var(--success-color);
+        }
+        
+        .change-negative {
+            color: var(--error-color);
+        }
+        
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            border: 2px dashed var(--border-color);
+        }
+        
+        .data-table {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .table-header {
+            background: var(--bg-secondary);
+            padding: var(--spacing-md);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table-row {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--divider-color);
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .property-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .property-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        
+        .property-meta {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .property-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            text-align: center;
+            min-width: 200px;
+        }
+        
+        .stat-item {
+            font-size: var(--font-size-sm);
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--font-size-xs);
+        }
+        
+        .conversion-funnel {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--divider-color);
+        }
+        
+        .funnel-step:last-child {
+            border-bottom: none;
+        }
+        
+        .funnel-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            color: white;
+            font-size: 14px;
+        }
+        
+        .funnel-content {
+            flex: 1;
+        }
+        
+        .funnel-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .funnel-progress {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        
+        .funnel-progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .funnel-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .export-section {
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+        
+        @media (max-width: 576px) {
+            .overview-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .property-stats {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-xs);
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">推广统计</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="exportReport()">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="navbar-action" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 统计概览头部 -->
+            <div class="stats-header">
+                <div class="stats-title">推广数据总览</div>
+                <div class="stats-subtitle">实时监控推广效果，优化营销策略</div>
+            </div>
+
+            <!-- 时间筛选 -->
+            <div class="time-filter">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-period="today" onclick="changePeriod('today')">今日</button>
+                    <button class="filter-tab" data-period="week" onclick="changePeriod('week')">本周</button>
+                    <button class="filter-tab" data-period="month" onclick="changePeriod('month')">本月</button>
+                    <button class="filter-tab" data-period="quarter" onclick="changePeriod('quarter')">本季度</button>
+                    <button class="filter-tab" data-period="year" onclick="changePeriod('year')">今年</button>
+                    <button class="filter-tab" data-period="custom" onclick="showCustomDatePicker()">自定义</button>
+                </div>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 核心指标概览 -->
+                <div class="overview-stats">
+                    <div class="overview-card">
+                        <div class="overview-icon" style="background: var(--primary-color);">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="overview-value" id="totalViews">1,234</div>
+                        <div class="overview-label">总浏览量</div>
+                        <div class="overview-change change-positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +15.3%
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-icon" style="background: var(--success-color);">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <div class="overview-value" id="totalShares">89</div>
+                        <div class="overview-label">分享次数</div>
+                        <div class="overview-change change-positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +8.7%
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-icon" style="background: var(--warning-color);">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="overview-value" id="totalInquiries">23</div>
+                        <div class="overview-label">咨询量</div>
+                        <div class="overview-change change-positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +12.5%
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-icon" style="background: var(--info-color);">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="overview-value" id="conversionRate">1.86%</div>
+                        <div class="overview-label">转化率</div>
+                        <div class="overview-change change-negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -2.1%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 访问趋势图 -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">访问趋势</div>
+                        <select class="form-control" style="width: auto;" onchange="changeChartType(this.value)">
+                            <option value="views">浏览量</option>
+                            <option value="shares">分享数</option>
+                            <option value="inquiries">咨询量</option>
+                        </select>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div>
+                            <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+                            <div>访问趋势图表</div>
+                            <div style="font-size: 12px; color: var(--text-hint); margin-top: 8px;">
+                                实际项目中集成Chart.js或ECharts
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 转化漏斗 -->
+                <div class="conversion-funnel">
+                    <div class="chart-header">
+                        <div class="chart-title">转化漏斗</div>
+                    </div>
+                    
+                    <div class="funnel-step">
+                        <div class="funnel-icon" style="background: var(--primary-color);">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="funnel-content">
+                            <div class="funnel-title">页面浏览</div>
+                            <div class="funnel-progress">
+                                <div class="funnel-progress-bar" style="width: 100%;"></div>
+                            </div>
+                            <div class="funnel-stats">
+                                <span>1,234人</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-step">
+                        <div class="funnel-icon" style="background: var(--info-color);">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="funnel-content">
+                            <div class="funnel-title">点击联系</div>
+                            <div class="funnel-progress">
+                                <div class="funnel-progress-bar" style="width: 15%;"></div>
+                            </div>
+                            <div class="funnel-stats">
+                                <span>185人</span>
+                                <span>15%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-step">
+                        <div class="funnel-icon" style="background: var(--warning-color);">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="funnel-content">
+                            <div class="funnel-title">发起咨询</div>
+                            <div class="funnel-progress">
+                                <div class="funnel-progress-bar" style="width: 8%;"></div>
+                            </div>
+                            <div class="funnel-stats">
+                                <span>98人</span>
+                                <span>8%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="funnel-step">
+                        <div class="funnel-icon" style="background: var(--success-color);">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="funnel-content">
+                            <div class="funnel-title">成功转化</div>
+                            <div class="funnel-progress">
+                                <div class="funnel-progress-bar" style="width: 1.9%;"></div>
+                            </div>
+                            <div class="funnel-stats">
+                                <span>23人</span>
+                                <span>1.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房源推广详情 -->
+                <div class="data-table">
+                    <div class="table-header">
+                        <i class="fas fa-building mr-2"></i>
+                        房源推广详情
+                    </div>
+                    
+                    <div id="propertyStatsTable">
+                        <!-- 房源统计数据将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 导出报告 -->
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="exportReport()">
+                        <i class="fas fa-file-export"></i>
+                        导出统计报告
+                    </button>
+                    <p class="text-secondary mt-2" style="font-size: var(--font-size-sm);">
+                        支持导出PDF、Excel格式的详细报告
+                    </p>
+                </div>
+            </main>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="../customer/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                </a>
+                <a href="../property/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 自定义日期选择器模态框 -->
+    <div id="datePickerModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">选择日期范围</h3>
+                <button class="modal-close" onclick="hideDatePicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">开始日期</label>
+                    <input type="date" class="form-control" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">结束日期</label>
+                    <input type="date" class="form-control" id="endDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="hideDatePicker()">取消</button>
+                <button class="btn btn-primary" onclick="applyCustomDate()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        let currentPeriod = 'today';
+        let statsData = {};
+        
+        // 模拟统计数据
+        const mockData = {
+            today: {
+                views: 1234,
+                shares: 89,
+                inquiries: 23,
+                conversion: 1.86,
+                properties: [
+                    {
+                        id: 1,
+                        name: '宝安工业园A栋厂房',
+                        location: '深圳市宝安区',
+                        views: 456,
+                        shares: 32,
+                        inquiries: 8,
+                        conversion: 1.75
+                    },
+                    {
+                        id: 2,
+                        name: '龙华科技园B区厂房',
+                        location: '深圳市龙华区',
+                        views: 378,
+                        shares: 28,
+                        inquiries: 6,
+                        conversion: 1.59
+                    },
+                    {
+                        id: 3,
+                        name: '光明新区工业园',
+                        location: '深圳市光明区',
+                        views: 289,
+                        shares: 19,
+                        inquiries: 5,
+                        conversion: 1.73
+                    }
+                ]
+            },
+            week: {
+                views: 8562,
+                shares: 634,
+                inquiries: 167,
+                conversion: 1.95,
+                properties: []
+            },
+            month: {
+                views: 32458,
+                shares: 2341,
+                inquiries: 578,
+                conversion: 1.78,
+                properties: []
+            }
+        };
+        
+        // 切换时间周期
+        function changePeriod(period) {
+            currentPeriod = period;
+            
+            // 更新选中状态
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-period="${period}"]`).classList.add('active');
+            
+            // 加载对应数据
+            loadStatsData(period);
+        }
+        
+        // 加载统计数据
+        function loadStatsData(period) {
+            Utils.showLoading('加载统计数据...');
+            
+            // 模拟API调用
+            setTimeout(() => {
+                const data = mockData[period] || mockData.today;
+                updateStatsDisplay(data);
+                renderPropertyStats(data.properties);
+                Utils.hideLoading();
+            }, 800);
+        }
+        
+        // 更新统计显示
+        function updateStatsDisplay(data) {
+            document.getElementById('totalViews').textContent = data.views.toLocaleString();
+            document.getElementById('totalShares').textContent = data.shares.toLocaleString();
+            document.getElementById('totalInquiries').textContent = data.inquiries.toLocaleString();
+            document.getElementById('conversionRate').textContent = data.conversion + '%';
+            
+            // 动画效果
+            document.querySelectorAll('.overview-card').forEach(card => {
+                card.classList.add('fade-in');
+            });
+        }
+        
+        // 渲染房源统计表格
+        function renderPropertyStats(properties) {
+            const container = document.getElementById('propertyStatsTable');
+            
+            if (!properties || properties.length === 0) {
+                container.innerHTML = `
+                    <div class="table-row">
+                        <div class="empty-state">
+                            <div class="icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="title">暂无详细统计数据</div>
+                            <div class="description">该时间段内无房源推广数据</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = properties.map(property => `
+                <div class="table-row">
+                    <div class="property-info">
+                        <div class="property-name">${property.name}</div>
+                        <div class="property-meta">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            ${property.location}
+                        </div>
+                    </div>
+                    <div class="property-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${property.views}</div>
+                            <div class="stat-label">浏览</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${property.shares}</div>
+                            <div class="stat-label">分享</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${property.inquiries}</div>
+                            <div class="stat-label">咨询</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 改变图表类型
+        function changeChartType(type) {
+            Utils.showToast(`切换到${type === 'views' ? '浏览量' : type === 'shares' ? '分享数' : '咨询量'}图表`, 'info');
+        }
+        
+        // 显示自定义日期选择器
+        function showCustomDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'flex';
+        }
+        
+        // 隐藏日期选择器
+        function hideDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'none';
+        }
+        
+        // 应用自定义日期
+        function applyCustomDate() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                Utils.showToast('请选择完整的日期范围', 'warning');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                Utils.showToast('开始日期不能晚于结束日期', 'warning');
+                return;
+            }
+            
+            hideDatePicker();
+            Utils.showToast(`已设置自定义日期范围：${startDate} 至 ${endDate}`, 'success');
+            
+            // 加载自定义日期数据
+            loadStatsData('custom');
+        }
+        
+        // 刷新数据
+        function refreshData() {
+            Utils.showToast('正在刷新数据...', 'info');
+            loadStatsData(currentPeriod);
+        }
+        
+        // 导出报告
+        function exportReport() {
+            Utils.showModal({
+                title: '导出统计报告',
+                content: `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-file-export text-primary" style="font-size: 48px;"></i>
+                        </div>
+                        <p>选择导出格式：</p>
+                        <div class="d-flex gap-2 justify-content-center mt-3">
+                            <button class="btn btn-primary" onclick="exportToPDF()">
+                                <i class="fas fa-file-pdf"></i>
+                                PDF报告
+                            </button>
+                            <button class="btn btn-success" onclick="exportToExcel()">
+                                <i class="fas fa-file-excel"></i>
+                                Excel数据
+                            </button>
+                        </div>
+                    </div>
+                `,
+                footer: false
+            });
+        }
+        
+        // 导出PDF
+        function exportToPDF() {
+            Utils.showToast('PDF报告导出功能开发中', 'info');
+        }
+        
+        // 导出Excel
+        function exportToExcel() {
+            Utils.showToast('Excel数据导出功能开发中', 'info');
+        }
+        
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期
+            const today = new Date();
+            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('startDate').value = lastWeek.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            
+            // 加载初始数据
+            loadStatsData(currentPeriod);
+        });
+        
+        // 导出函数供全局使用
+        window.changePeriod = changePeriod;
+        window.changeChartType = changeChartType;
+        window.showCustomDatePicker = showCustomDatePicker;
+        window.hideDatePicker = hideDatePicker;
+        window.applyCustomDate = applyCustomDate;
+        window.refreshData = refreshData;
+        window.exportReport = exportReport;
+        window.exportToPDF = exportToPDF;
+        window.exportToExcel = exportToExcel;
+    </script>
+</body>
+</html>

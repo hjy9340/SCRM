@@ -1,0 +1,253 @@
+/* 图片优化样式 */
+
+/* 图片懒加载样式 */
+.lazy-image {
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+}
+
+.lazy-image.loading {
+    opacity: 0.7;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: imageLoading 1.5s infinite;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+.lazy-image.error {
+    opacity: 1;
+    filter: grayscale(100%);
+    background: var(--bg-secondary);
+    position: relative;
+}
+
+.lazy-image.error::after {
+    content: '图片加载失败';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-hint);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+/* 加载动画 */
+@keyframes imageLoading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* 占位符样式 */
+.image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    color: var(--text-hint);
+    font-size: var(--font-size-sm);
+    min-height: 60px;
+    border-radius: var(--border-radius-small);
+}
+
+.image-placeholder i {
+    font-size: 2em;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* 图片容器优化 */
+.property-image,
+.customer-avatar,
+.gallery-image {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.property-image::before,
+.customer-avatar::before,
+.gallery-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+    z-index: 1;
+}
+
+.property-image img,
+.customer-avatar img,
+.gallery-image img {
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* 响应式图片优化 */
+img[data-responsive] {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+img[data-responsive]:hover {
+    transform: scale(1.02);
+}
+
+/* 高清屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .lazy-image {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* 预加载动画 */
+.preloading {
+    position: relative;
+}
+
+.preloading::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 4px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* 图片画廊优化 */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+}
+
+.gallery-item {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--bg-secondary);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-xs);
+        padding: var(--spacing-sm);
+    }
+    
+    .lazy-image.loading {
+        animation-duration: 2s; /* 移动端稍慢的动画 */
+    }
+    
+    img[data-responsive]:hover {
+        transform: none; /* 移动端禁用hover效果 */
+    }
+}
+
+/* 性能优化 */
+.image-container {
+    contain: layout style paint;
+    content-visibility: auto;
+    contain-intrinsic-size: 300px 200px;
+}
+
+/* 减少重绘 */
+img {
+    image-rendering: optimizeQuality;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* 关键资源提示 */
+.critical-image {
+    content-visibility: visible;
+}
+
+/* 错误状态样式增强 */
+.image-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    background: var(--bg-secondary);
+    color: var(--text-hint);
+    text-align: center;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.image-error i {
+    font-size: 2em;
+    margin-bottom: var(--spacing-sm);
+    color: var(--error-color);
+}
+
+.image-error .error-text {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.image-error .retry-button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--primary-color);
+    color: white;
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.image-error .retry-button:hover {
+    background: var(--primary-dark);
+}

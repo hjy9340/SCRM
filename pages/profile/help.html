@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帮助中心 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .search-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            padding: var(--spacing-xl);
+            color: white;
+        }
+        
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .search-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .search-subtitle {
+            opacity: 0.9;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            padding-right: 50px;
+            border: none;
+            border-radius: 25px;
+            font-size: var(--font-size-base);
+            background: white;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: var(--spacing-sm);
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .quick-links {
+            background: white;
+            padding: var(--spacing-lg);
+        }
+        
+        .quick-links-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .quick-item {
+            text-align: center;
+            padding: var(--spacing-lg) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .quick-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .quick-icon {
+            font-size: 32px;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .quick-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .quick-desc {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .help-section {
+            background: white;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .section-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            color: white;
+        }
+        
+        .section-icon.faq {
+            background: var(--info-color);
+        }
+        
+        .section-icon.tutorial {
+            background: var(--success-color);
+        }
+        
+        .section-icon.contact {
+            background: var(--warning-color);
+        }
+        
+        .section-content {
+            flex: 1;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .section-arrow {
+            color: var(--text-hint);
+            transition: transform 0.3s ease;
+        }
+        
+        .section-header.expanded .section-arrow {
+            transform: rotate(90deg);
+        }
+        
+        .section-body {
+            padding: 0 var(--spacing-lg) var(--spacing-lg);
+            display: none;
+        }
+        
+        .section-body.expanded {
+            display: block;
+        }
+        
+        .faq-list {
+            space-y: var(--spacing-sm);
+        }
+        
+        .faq-item {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: var(--border-color);
+        }
+        
+        .faq-question.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .faq-answer {
+            padding: var(--spacing-md);
+            display: none;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        .faq-answer.show {
+            display: block;
+        }
+        
+        .tutorial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .tutorial-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tutorial-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .tutorial-thumb {
+            aspect-ratio: 16/9;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--text-hint);
+        }
+        
+        .tutorial-info {
+            padding: var(--spacing-md);
+        }
+        
+        .tutorial-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .tutorial-desc {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .tutorial-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-size-xs);
+            color: var(--text-hint);
+        }
+        
+        .contact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .contact-card {
+            text-align: center;
+            padding: var(--spacing-xl);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .contact-card:hover {
+            border-color: var(--primary-color);
+            background: rgba(25, 118, 210, 0.05);
+        }
+        
+        .contact-card-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .contact-card-icon.phone {
+            color: var(--success-color);
+        }
+        
+        .contact-card-icon.email {
+            color: var(--info-color);
+        }
+        
+        .contact-card-icon.chat {
+            color: var(--warning-color);
+        }
+        
+        .contact-card-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .contact-card-desc {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .contact-card-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .contact-card-action:hover {
+            background: var(--primary-dark);
+        }
+        
+        .feedback-form {
+            background: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-section {
+                padding: var(--spacing-lg);
+            }
+            
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tutorial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">帮助中心</div>
+            </header>
+
+            <!-- 搜索区域 -->
+            <div class="search-section">
+                <div class="search-container">
+                    <h1 class="search-title">有什么可以帮您？</h1>
+                    <p class="search-subtitle">搜索您需要的帮助信息</p>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="输入关键词搜索..." id="searchInput">
+                        <button class="search-btn" onclick="searchHelp()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快捷链接 -->
+            <div class="quick-links">
+                <h3 class="quick-links-title">常用功能</h3>
+                <div class="quick-grid">
+                    <a href="#faq" class="quick-item" onclick="scrollToSection('faq')">
+                        <div class="quick-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="quick-title">常见问题</div>
+                        <div class="quick-desc">查看常见问题解答</div>
+                    </a>
+                    
+                    <a href="#tutorial" class="quick-item" onclick="scrollToSection('tutorial')">
+                        <div class="quick-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="quick-title">视频教程</div>
+                        <div class="quick-desc">观看操作教程</div>
+                    </a>
+                    
+                    <a href="#contact" class="quick-item" onclick="scrollToSection('contact')">
+                        <div class="quick-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="quick-title">联系客服</div>
+                        <div class="quick-desc">获取专业帮助</div>
+                    </a>
+                    
+                    <a href="#feedback" class="quick-item" onclick="scrollToSection('feedback')">
+                        <div class="quick-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="quick-title">意见反馈</div>
+                        <div class="quick-desc">提交建议和问题</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 页面内容 -->
+            <main class="page-content">
+                <!-- 常见问题 -->
+                <div class="help-section" id="faq">
+                    <div class="section-header" onclick="toggleSection('faq')">
+                        <div class="section-icon faq">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-title">常见问题</div>
+                            <div class="section-desc">查看用户最常遇到的问题和解答</div>
+                        </div>
+                        <div class="section-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="section-body" id="faqBody">
+                        <div class="faq-list">
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFaq(this)">
+                                    <span>如何添加新的房源信息？</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    进入房源管理页面，点击右下角的"+"按钮，填写房源的基本信息、位置信息、配套设施等，上传房源图片，最后点击"发布房源"即可。
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFaq(this)">
+                                    <span>如何使用AI图片生成功能？</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    在房源编辑页面的图片上传区域，点击"AI生成房源图片"按钮，选择合适的模板和配色方案，输入房源信息，点击"AI智能生成"即可生成专业的房源宣传图片。
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFaq(this)">
+                                    <span>如何跟进客户并记录沟通情况？</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    进入客户详情页面，点击"添加跟进"按钮，记录沟通内容、客户反馈、下次跟进时间等信息。系统会自动生成跟进时间轴，帮您更好地管理客户关系。
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFaq(this)">
+                                    <span>如何查看推广统计数据？</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    进入推广中心，点击"数据统计"可查看分享次数、浏览量、咨询量等详细数据。还可以查看具体的转化漏斗和佣金收益明细。
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFaq(this)">
+                                    <span>忘记密码怎么办？</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    在登录页面点击"忘记密码"，输入手机号码，系统会发送验证码到您的手机，验证成功后可重置密码。也可以联系管理员帮助重置。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视频教程 -->
+                <div class="help-section" id="tutorial">
+                    <div class="section-header" onclick="toggleSection('tutorial')">
+                        <div class="section-icon tutorial">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-title">视频教程</div>
+                            <div class="section-desc">观看详细的操作指导视频</div>
+                        </div>
+                        <div class="section-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="section-body" id="tutorialBody">
+                        <div class="tutorial-grid">
+                            <div class="tutorial-card" onclick="playTutorial('basic')">
+                                <div class="tutorial-thumb">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="tutorial-info">
+                                    <div class="tutorial-title">系统基础操作</div>
+                                    <div class="tutorial-desc">了解系统的基本功能和操作方法</div>
+                                    <div class="tutorial-meta">
+                                        <span>8分钟</span>
+                                        <span>初级</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tutorial-card" onclick="playTutorial('customer')">
+                                <div class="tutorial-thumb">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="tutorial-info">
+                                    <div class="tutorial-title">客户管理指南</div>
+                                    <div class="tutorial-desc">学习如何高效管理客户信息和跟进</div>
+                                    <div class="tutorial-meta">
+                                        <span>12分钟</span>
+                                        <span>中级</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tutorial-card" onclick="playTutorial('property')">
+                                <div class="tutorial-thumb">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="tutorial-info">
+                                    <div class="tutorial-title">房源发布技巧</div>
+                                    <div class="tutorial-desc">掌握房源信息发布和图片生成技巧</div>
+                                    <div class="tutorial-meta">
+                                        <span>15分钟</span>
+                                        <span>中级</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tutorial-card" onclick="playTutorial('promotion')">
+                                <div class="tutorial-thumb">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="tutorial-info">
+                                    <div class="tutorial-title">推广营销策略</div>
+                                    <div class="tutorial-desc">学习如何通过系统进行有效推广</div>
+                                    <div class="tutorial-meta">
+                                        <span>20分钟</span>
+                                        <span>高级</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 联系我们 -->
+                <div class="help-section" id="contact">
+                    <div class="section-header" onclick="toggleSection('contact')">
+                        <div class="section-icon contact">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-title">联系我们</div>
+                            <div class="section-desc">多种方式获取专业技术支持</div>
+                        </div>
+                        <div class="section-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="section-body" id="contactBody">
+                        <div class="contact-options">
+                            <div class="contact-card" onclick="callSupport()">
+                                <div class="contact-card-icon phone">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div class="contact-card-title">电话支持</div>
+                                <div class="contact-card-desc">工作日 9:00-18:00<br>400-888-9999</div>
+                                <button class="contact-card-action">立即拨打</button>
+                            </div>
+                            
+                            <div class="contact-card" onclick="sendEmail()">
+                                <div class="contact-card-icon email">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-card-title">邮件支持</div>
+                                <div class="contact-card-desc">24小时内回复<br>support@scrm.com</div>
+                                <button class="contact-card-action">发送邮件</button>
+                            </div>
+                            
+                            <div class="contact-card" onclick="openChat()">
+                                <div class="contact-card-icon chat">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="contact-card-title">在线客服</div>
+                                <div class="contact-card-desc">实时沟通解答<br>工作时间在线</div>
+                                <button class="contact-card-action">开始对话</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 意见反馈 -->
+                <div class="help-section" id="feedback">
+                    <div class="section-header" onclick="toggleSection('feedback')">
+                        <div class="section-icon contact">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="section-content">
+                            <div class="section-title">意见反馈</div>
+                            <div class="section-desc">帮助我们改进产品和服务</div>
+                        </div>
+                        <div class="section-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="section-body" id="feedbackBody">
+                        <div class="feedback-form">
+                            <div class="form-group">
+                                <label class="form-label">反馈类型</label>
+                                <select class="form-input">
+                                    <option>功能建议</option>
+                                    <option>问题反馈</option>
+                                    <option>界面优化</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">详细描述</label>
+                                <textarea class="form-input form-textarea" placeholder="请详细描述您的问题或建议..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">联系方式（可选）</label>
+                                <input type="email" class="form-input" placeholder="您的邮箱地址">
+                            </div>
+                            
+                            <button class="btn btn-primary" onclick="submitFeedback()">提交反馈</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+        function searchHelp() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                showToast(`搜索："${query}"`, 'info');
+                // 这里可以实现搜索功能
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleSection(sectionId) {
+            const header = event.currentTarget;
+            const body = document.getElementById(sectionId + 'Body');
+            
+            header.classList.toggle('expanded');
+            body.classList.toggle('expanded');
+        }
+
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            // 关闭其他FAQ
+            document.querySelectorAll('.faq-question.active').forEach(q => {
+                if (q !== element) {
+                    q.classList.remove('active');
+                    q.nextElementSibling.classList.remove('show');
+                    q.querySelector('i').classList.remove('fa-chevron-up');
+                    q.querySelector('i').classList.add('fa-chevron-down');
+                }
+            });
+            
+            // 切换当前FAQ
+            element.classList.toggle('active');
+            answer.classList.toggle('show');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+
+        function playTutorial(type) {
+            showToast(`播放教程：${type}`, 'info');
+            // 这里可以集成视频播放器
+        }
+
+        function callSupport() {
+            if (confirm('是否拨打客服电话 400-888-9999？')) {
+                window.open('tel:4008889999');
+            }
+        }
+
+        function sendEmail() {
+            window.open('mailto:support@scrm.com?subject=技术支持请求');
+        }
+
+        function openChat() {
+            showToast('正在连接在线客服...', 'info');
+            // 这里可以集成在线客服系统
+        }
+
+        function submitFeedback() {
+            showToast('感谢您的反馈！我们会认真处理。', 'success');
+        }
+
+        // 搜索框回车事件
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchHelp();
+            }
+        });
+
+        // 页面加载时展开第一个FAQ
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstFaq = document.querySelector('.faq-question');
+            if (firstFaq) {
+                toggleFaq(firstFaq);
+            }
+        });
+    </script>
+</body>
+</html>

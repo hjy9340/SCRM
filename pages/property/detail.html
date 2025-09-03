@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房源详情 - 工业地产SCRM</title>
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page">
+            <!-- 顶部导航栏 -->
+            <header class="navbar">
+                <button class="navbar-back" onclick="Navigation.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">房源详情</div>
+                <div class="navbar-actions">
+                    <button class="navbar-action" onclick="openImageGenerator()">
+                        <i class="fas fa-magic"></i>
+                    </button>
+                    <button class="navbar-action" onclick="shareProperty()">
+                        <i class="fas fa-share"></i>
+                    </button>
+                    <button class="navbar-action" onclick="editProperty()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <main class="page-content" style="padding-bottom: 80px;">
+                <!-- 房源图片轮播 -->
+                <div class="property-gallery">
+                    <div class="carousel" id="propertyCarousel">
+                        <div class="carousel-inner" id="carouselInner">
+                            <!-- 图片将通过JavaScript动态加载 -->
+                        </div>
+                        <button class="carousel-btn carousel-prev" onclick="prevImage()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-btn carousel-next" onclick="nextImage()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="carousel-indicators" id="carouselIndicators">
+                            <!-- 指示器将通过JavaScript动态生成 -->
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="gallery-action" onclick="showAllImages()">
+                                <i class="fas fa-images"></i>
+                                <span id="imageCount">1/8</span>
+                            </button>
+                            <button class="gallery-action" onclick="showVirtualTour()">
+                                <i class="fas fa-cube"></i>
+                                360全景
+                            </button>
+                            <button class="gallery-action" onclick="showVideo()">
+                                <i class="fas fa-play"></i>
+                                视频
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 360全景查看器 -->
+                <div class="virtual-tour-modal" id="virtualTourModal" style="display: none;">
+                    <div class="modal-backdrop" onclick="closeVirtualTour()"></div>
+                    <div class="virtual-tour-container">
+                        <div class="virtual-tour-header">
+                            <h3>360度全景看房</h3>
+                            <button class="modal-close" onclick="closeVirtualTour()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="virtual-tour-viewer" id="virtualTourViewer">
+                            <div class="panorama-container">
+                                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop" 
+                                     alt="360全景图" 
+                                     class="panorama-image" 
+                                     id="panoramaImage"
+                                     data-responsive 
+                                     data-base-url="https://images.unsplash.com/photo-1586023492125-27b2c045efd7"
+                                     data-sizes='{"xs":{"width":375,"height":250},"sm":{"width":576,"height":350},"md":{"width":768,"height":400},"lg":{"width":1200,"height":600}}'
+                                     loading="lazy"
+                                     onerror="this.src='https://via.placeholder.com/1200x600?text=360全景图'">
+                                <div class="panorama-controls">
+                                    <button class="control-btn" onclick="rotatePanorama(-10)">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                    <button class="control-btn" onclick="resetPanorama()">
+                                        <i class="fas fa-compress-arrows-alt"></i>
+                                    </button>
+                                    <button class="control-btn" onclick="rotatePanorama(10)">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                </div>
+                                <div class="panorama-hotspots">
+                                    <div class="hotspot" style="top: 40%; left: 30%;" data-info="生产区域">
+                                        <div class="hotspot-marker">+</div>
+                                        <div class="hotspot-tooltip">生产区域</div>
+                                    </div>
+                                    <div class="hotspot" style="top: 60%; left: 70%;" data-info="办公区域">
+                                        <div class="hotspot-marker">+</div>
+                                        <div class="hotspot-tooltip">办公区域</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视频播放器 -->
+                <div class="video-modal" id="videoModal" style="display: none;">
+                    <div class="modal-backdrop" onclick="closeVideo()"></div>
+                    <div class="video-container">
+                        <div class="video-header">
+                            <h3>房源视频介绍</h3>
+                            <button class="modal-close" onclick="closeVideo()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="video-player">
+                            <video id="propertyVideo" controls poster="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=450&fit=crop">
+                                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                                您的浏览器不支持视频播放。
+                            </video>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图片查看器 -->
+                <div class="image-viewer-modal" id="imageViewerModal" style="display: none;">
+                    <div class="modal-backdrop" onclick="closeImageViewer()"></div>
+                    <div class="image-viewer-container">
+                        <div class="image-viewer-header">
+                            <h3>房源图片</h3>
+                            <button class="modal-close" onclick="closeImageViewer()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="image-viewer">
+                            <div class="viewer-main">
+                                <img id="viewerMainImage" src="" alt="房源图片">
+                                <button class="viewer-btn viewer-prev" onclick="viewerPrevImage()">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="viewer-btn viewer-next" onclick="viewerNextImage()">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="viewer-thumbnails" id="viewerThumbnails">
+                                <!-- 缩略图将通过JavaScript生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房源基本信息 -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="property-header">
+                            <h1 class="property-title" id="propertyTitle">深圳宝安区工业园厂房</h1>
+                            <div class="property-status">
+                                <span class="status-badge success" id="propertyStatus">可租</span>
+                            </div>
+                        </div>
+                        
+                        <div class="property-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="propertyLocation">深圳市宝安区石岩工业园B区</span>
+                        </div>
+                        
+                        <div class="property-price-area">
+                            <div class="price-section">
+                                <div class="price-label">租金</div>
+                                <div class="price-value" id="propertyPrice">80元/㎡/月</div>
+                            </div>
+                            <div class="area-section">
+                                <div class="area-label">建筑面积</div>
+                                <div class="area-value" id="propertyArea">3000㎡</div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-highlights">
+                            <div class="highlight-item">
+                                <i class="fas fa-arrows-alt-v"></i>
+                                <span>8米层高</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="fas fa-weight"></i>
+                                <span>800kg/㎡</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="fas fa-fire"></i>
+                                <span>消防达标</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="fas fa-certificate"></i>
+                                <span>红本产权</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房源详细参数 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-list-alt text-primary mr-2"></i>
+                        详细参数
+                    </div>
+                    <div class="card-body">
+                        <div class="param-grid">
+                            <div class="param-item">
+                                <div class="param-label">土地性质</div>
+                                <div class="param-value" id="landType">工业用地</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">产权情况</div>
+                                <div class="param-value" id="ownership">红本独立产权</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">层高</div>
+                                <div class="param-value" id="height">8米</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">承重</div>
+                                <div class="param-value" id="loadBearing">800kg/㎡</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">配电</div>
+                                <div class="param-value" id="power">1000KVA</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">消防</div>
+                                <div class="param-value" id="firefighting">自动喷淋系统</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 周边配套 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-map text-success mr-2"></i>
+                        周边配套
+                    </div>
+                    <div class="card-body">
+                        <div class="facilities-list">
+                            <div class="facility-item">
+                                <i class="fas fa-subway"></i>
+                                <div class="facility-info">
+                                    <div class="facility-name">地铁交通</div>
+                                    <div class="facility-desc">距离6号线石岩站2公里</div>
+                                </div>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-road"></i>
+                                <div class="facility-info">
+                                    <div class="facility-name">高速公路</div>
+                                    <div class="facility-desc">距离机荷高速入口500米</div>
+                                </div>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-shopping-cart"></i>
+                                <div class="facility-info">
+                                    <div class="facility-name">生活配套</div>
+                                    <div class="facility-desc">周边商超、餐饮配套齐全</div>
+                                </div>
+                            </div>
+                            <div class="facility-item">
+                                <i class="fas fa-bed"></i>
+                                <div class="facility-info">
+                                    <div class="facility-name">员工住宿</div>
+                                    <div class="facility-desc">附近有多处员工宿舍</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 负责人信息 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-tie text-warning mr-2"></i>
+                        负责人
+                    </div>
+                    <div class="card-body">
+                        <div class="agent-info">
+                            <div class="agent-avatar">
+                                <img src="https://via.placeholder.com/60x60?text=王" alt="负责人头像" id="agentAvatar">
+                            </div>
+                            <div class="agent-details">
+                                <div class="agent-name" id="agentName">王销售</div>
+                                <div class="agent-title" id="agentTitle">高级置业顾问</div>
+                                <div class="agent-phone" id="agentPhone">138-1234-5678</div>
+                            </div>
+                            <div class="agent-actions">
+                                <button class="btn btn-primary btn-small" onclick="callAgent()">
+                                    <i class="fas fa-phone"></i>
+                                    致电
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 浏览记录 -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line text-info mr-2"></i>
+                        浏览统计
+                    </div>
+                    <div class="card-body">
+                        <div class="view-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalViews">125</div>
+                                <div class="stat-label">总浏览量</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="todayViews">8</div>
+                                <div class="stat-label">今日浏览</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="inquiries">12</div>
+                                <div class="stat-label">咨询次数</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="collections">5</div>
+                                <div class="stat-label">收藏次数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部固定操作栏 -->
+            <div class="fixed-actions">
+                <button class="action-btn secondary" onclick="toggleCollection()">
+                    <i class="fas fa-heart" id="collectionIcon"></i>
+                    <span id="collectionText">收藏</span>
+                </button>
+                <button class="action-btn primary" onclick="shareProperty()">
+                    <i class="fas fa-share"></i>
+                    分享推广
+                </button>
+                <button class="action-btn success" onclick="recommendToCustomer()">
+                    <i class="fas fa-user-plus"></i>
+                    推荐客户
+                </button>
+            </div>
+
+            <!-- 底部导航栏 -->
+            <nav class="tabbar">
+                <a href="../index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    首页
+                </a>
+                <a href="../customer/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    客户
+                </a>
+                <a href="index.html" class="tabbar-item active">
+                    <div class="icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    房源
+                </a>
+                <a href="../promotion/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    推广
+                </a>
+                <a href="../profile/index.html" class="tabbar-item">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    我的
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <script src="../../assets/js/common.js"></script>
+    <script>
+// 房源详情页功能
+let propertyId = null;
+let propertyData = null;
+let currentImageIndex = 0;
+let isCollected = false;
+
+// 页面初始化
+document.addEventListener('DOMContentLoaded', function() {
+    propertyId = Utils.getUrlParam('id') || '1';
+    loadPropertyData();
+    recordPageView();
+});
+
+// 加载房源数据
+async function loadPropertyData() {
+    try {
+        Utils.showLoading('加载房源信息...');
+        
+        const response = await API.request(`/api/properties/${propertyId}`);
+        if (response.success) {
+            propertyData = response.data;
+            renderPropertyData();
+            renderImageGallery();
+        }
+        
+        Utils.hideLoading();
+    } catch (error) {
+        Utils.hideLoading();
+        Utils.showToast('房源信息加载失败', 'error');
+    }
+}
+
+// 渲染房源数据
+function renderPropertyData() {
+    if (!propertyData) return;
+    
+    // 基本信息
+    document.getElementById('propertyTitle').textContent = propertyData.title;
+    document.getElementById('propertyLocation').textContent = propertyData.location;
+    document.getElementById('propertyPrice').textContent = `${propertyData.price}元/㎡/月`;
+    document.getElementById('propertyArea').textContent = `${propertyData.area}㎡`;
+    
+    // 状态
+    const statusEl = document.getElementById('propertyStatus');
+    statusEl.textContent = propertyData.status;
+    statusEl.className = `status-badge ${getStatusClass(propertyData.type)}`;
+    
+    // 详细参数
+    document.getElementById('landType').textContent = propertyData.landType || '工业用地';
+    document.getElementById('ownership').textContent = propertyData.ownership || '红本独立产权';
+    document.getElementById('height').textContent = `${propertyData.height}米`;
+    document.getElementById('loadBearing').textContent = `${propertyData.load}kg/㎡`;
+    document.getElementById('power').textContent = `${propertyData.power}KVA`;
+    document.getElementById('firefighting').textContent = propertyData.firefighting || '自动喷淋系统';
+    
+    // 负责人信息
+    if (propertyData.agent) {
+        document.getElementById('agentName').textContent = propertyData.agent.name;
+        document.getElementById('agentTitle').textContent = propertyData.agent.title;
+        document.getElementById('agentPhone').textContent = propertyData.agent.phone;
+    }
+    
+    // 统计数据
+    document.getElementById('totalViews').textContent = propertyData.views || 125;
+    document.getElementById('todayViews').textContent = propertyData.todayViews || 8;
+    document.getElementById('inquiries').textContent = propertyData.inquiries || 12;
+    document.getElementById('collections').textContent = propertyData.collections || 5;
+    
+    // 收藏状态
+    isCollected = propertyData.isCollected || false;
+    updateCollectionStatus();
+}
+
+// 渲染图片画廊
+function renderImageGallery() {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop', // 现代工业厂房外观
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop', // 工业设备和机器
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop', // 大型工业设施
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop', // 仓库内部视图
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop', // 现代办公楼
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop', // 现代办公空间
+        'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop', // 工业区域俯视图
+        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'  // 商业建筑外观
+    ];
+    
+    const carouselInner = document.getElementById('carouselInner');
+    const indicators = document.getElementById('carouselIndicators');
+    
+    carouselInner.innerHTML = images.map((img, index) => `
+        <div class="carousel-item" style="display: ${index === 0 ? 'block' : 'none'}">
+            <img src="${img}" alt="房源图片${index + 1}" loading="lazy">
+        </div>
+    `).join('');
+    
+    indicators.innerHTML = images.map((_, index) => `
+        <button class="carousel-indicator ${index === 0 ? 'active' : ''}" onclick="showImage(${index})"></button>
+    `).join('');
+    
+    document.getElementById('imageCount').textContent = `1/${images.length}`;
+}
+
+// 显示指定图片
+function showImage(index) {
+    const items = document.querySelectorAll('.carousel-item');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    
+    items.forEach((item, i) => {
+        item.style.display = i === index ? 'block' : 'none';
+    });
+    
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+    
+    currentImageIndex = index;
+    document.getElementById('imageCount').textContent = `${index + 1}/${items.length}`;
+}
+
+// 获取状态样式类
+function getStatusClass(type) {
+    const statusMap = {
+        '出租': 'success',
+        '出售': 'primary',
+        '已成交': 'secondary'
+    };
+    return statusMap[type] || 'success';
+}
+
+// 记录页面浏览
+async function recordPageView() {
+    try {
+        await API.request(`/api/properties/${propertyId}/view`, {
+            method: 'POST'
+        });
+    } catch (error) {
+        console.log('记录浏览量失败:', error);
+    }
+}
+
+// 分享房源
+function shareProperty() {
+    const shareUrl = `${window.location.origin}/pages/share/property.html?id=${propertyId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: propertyData.title,
+            text: `推荐一个优质工业厂房：${propertyData.title}`,
+            url: shareUrl
+        });
+    } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            Utils.showToast('分享链接已复制到剪贴板', 'success');
+        });
+    }
+}
+
+// 编辑房源
+function editProperty() {
+    Navigation.goto(`edit.html?id=${propertyId}`);
+}
+
+// 打开图片生成器
+function openImageGenerator() {
+    const propertyInfo = {
+        title: propertyData?.title || '优质工业厂房',
+        location: propertyData?.location || '广州市天河区',
+        price: propertyData?.price || 25,
+        type: propertyData?.type || '出租'
+    };
+    
+    // 将房源信息传递给图片生成器
+    const params = new URLSearchParams(propertyInfo).toString();
+    window.open(`image-generator.html?${params}`, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+}
+
+// 切换收藏状态
+async function toggleCollection() {
+    try {
+        const action = isCollected ? 'uncollect' : 'collect';
+        
+        await API.request(`/api/properties/${propertyId}/${action}`, {
+            method: 'POST'
+        });
+        
+        isCollected = !isCollected;
+        updateCollectionStatus();
+        
+        const message = isCollected ? '已收藏' : '已取消收藏';
+        Utils.showToast(message, 'success');
+        
+    } catch (error) {
+        Utils.showToast('操作失败', 'error');
+    }
+}
+
+// 更新收藏状态
+function updateCollectionStatus() {
+    const icon = document.getElementById('collectionIcon');
+    const text = document.getElementById('collectionText');
+    
+    if (isCollected) {
+        icon.className = 'fas fa-heart';
+        icon.style.color = 'var(--error-color)';
+        text.textContent = '已收藏';
+    } else {
+        icon.className = 'far fa-heart';
+        icon.style.color = '';
+        text.textContent = '收藏';
+    }
+}
+
+// 推荐给客户
+function recommendToCustomer() {
+    Navigation.goto(`../customer/index.html?recommend=${propertyId}`);
+}
+
+// 致电负责人
+function callAgent() {
+    const phone = propertyData?.agent?.phone || '138-1234-5678';
+    window.location.href = `tel:${phone}`;
+}
+
+// 显示所有图片
+function showAllImages() {
+    const modal = document.getElementById('imageViewerModal');
+    modal.style.display = 'block';
+    
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    currentImageIndex = 0;
+    updateImageViewer(images);
+}
+
+// 更新图片查看器
+function updateImageViewer(images) {
+    const mainImage = document.getElementById('viewerMainImage');
+    const thumbnails = document.getElementById('viewerThumbnails');
+    
+    mainImage.src = images[currentImageIndex];
+    
+    thumbnails.innerHTML = images.map((img, index) => `
+        <div class="viewer-thumbnail ${index === currentImageIndex ? 'active' : ''}" 
+             onclick="viewImage(${index})">
+            <img src="${img}" alt="缩略图${index + 1}">
+        </div>
+    `).join('');
+}
+
+// 查看指定图片
+function viewImage(index) {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    currentImageIndex = index;
+    updateImageViewer(images);
+}
+
+// 上一张图片（查看器）
+function viewerPrevImage() {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+    updateImageViewer(images);
+}
+
+// 下一张图片（查看器）
+function viewerNextImage() {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    currentImageIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+    updateImageViewer(images);
+}
+
+// 关闭图片查看器
+function closeImageViewer() {
+    document.getElementById('imageViewerModal').style.display = 'none';
+}
+
+// 显示全景
+function showVirtualTour() {
+    const modal = document.getElementById('virtualTourModal');
+    modal.style.display = 'block';
+    
+    // 初始化全景图
+    initPanorama();
+}
+
+// 初始化全景图
+function initPanorama() {
+    const panoramaImage = document.getElementById('panoramaImage');
+    let isDragging = false;
+    let startX = 0;
+    let currentRotation = 0;
+    
+    panoramaImage.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.clientX - startX;
+        currentRotation += deltaX * 0.1;
+        panoramaImage.style.transform = `translateX(${currentRotation}px)`;
+        startX = e.clientX;
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    
+    // 触摸事件支持
+    panoramaImage.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+    });
+    
+    panoramaImage.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        
+        const deltaX = e.touches[0].clientX - startX;
+        currentRotation += deltaX * 0.1;
+        panoramaImage.style.transform = `translateX(${currentRotation}px)`;
+        startX = e.touches[0].clientX;
+    });
+    
+    panoramaImage.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+}
+
+// 旋转全景图
+function rotatePanorama(angle) {
+    const panoramaImage = document.getElementById('panoramaImage');
+    const currentTransform = panoramaImage.style.transform || 'translateX(0px)';
+    const currentX = parseInt(currentTransform.match(/translateX\(([^)]+)px\)/)?.[1] || 0);
+    const newX = currentX + angle * 10;
+    
+    panoramaImage.style.transform = `translateX(${newX}px)`;
+}
+
+// 重置全景图
+function resetPanorama() {
+    const panoramaImage = document.getElementById('panoramaImage');
+    panoramaImage.style.transform = 'translateX(0px)';
+}
+
+// 关闭全景
+function closeVirtualTour() {
+    document.getElementById('virtualTourModal').style.display = 'none';
+}
+
+// 显示视频
+function showVideo() {
+    const modal = document.getElementById('videoModal');
+    modal.style.display = 'block';
+    
+    const video = document.getElementById('propertyVideo');
+    video.currentTime = 0; // 重置播放位置
+}
+
+// 关闭视频
+function closeVideo() {
+    const modal = document.getElementById('videoModal');
+    const video = document.getElementById('propertyVideo');
+    
+    video.pause();
+    modal.style.display = 'none';
+}
+
+// 上一张图片（轮播）
+function prevImage() {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    const prevIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+    showImage(prevIndex);
+}
+
+// 下一张图片（轮播）
+function nextImage() {
+    const images = propertyData.images || [
+        'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop'
+    ];
+    
+    const nextIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+    showImage(nextIndex);
+}
+
+// 扩展API模拟数据
+API.getMockPropertyDetail = function(propertyId) {
+    return {
+        success: true,
+        data: {
+            id: propertyId,
+            title: '深圳宝安区工业园厂房',
+            location: '深圳市宝安区石岩工业园B区',
+            price: 80,
+            area: 3000,
+            height: 8,
+            load: 800,
+            type: '出租',
+            status: '可租',
+            landType: '工业用地',
+            ownership: '红本独立产权',
+            power: 1000,
+            firefighting: '自动喷淋系统',
+            views: 125,
+            todayViews: 8,
+            inquiries: 12,
+            collections: 5,
+            isCollected: false,
+            agent: {
+                name: '王销售',
+                title: '高级置业顾问',
+                phone: '138-1234-5678'
+            },
+            images: [
+                'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop', // 现代工业厂房外观
+                'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&h=600&fit=crop', // 工业设备和机器
+                'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop', // 大型工业设施
+                'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=600&fit=crop', // 仓库内部视图
+                'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop', // 现代办公楼
+                'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop', // 现代办公空间
+                'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop', // 工业区域俯视图
+                'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop'  // 商业建筑外观
+            ]
+        }
+    };
+};
+
+// 覆盖API调用
+const originalRequest = API.request;
+API.request = function(url, options = {}) {
+    if (url.match(/\/api\/properties\/\d+$/) && !options.method) {
+        return Promise.resolve(API.getMockPropertyDetail(propertyId));
+    }
+    return originalRequest.call(this, url, options);
+};
+
+// 导出函数
+window.showImage = showImage;
+window.prevImage = prevImage;
+window.nextImage = nextImage;
+window.shareProperty = shareProperty;
+window.editProperty = editProperty;
+window.openImageGenerator = openImageGenerator;
+window.toggleCollection = toggleCollection;
+window.recommendToCustomer = recommendToCustomer;
+window.callAgent = callAgent;
+window.showAllImages = showAllImages;
+window.showVirtualTour = showVirtualTour;
+window.showVideo = showVideo;
+window.closeImageViewer = closeImageViewer;
+window.closeVirtualTour = closeVirtualTour;
+window.closeVideo = closeVideo;
+window.viewImage = viewImage;
+window.viewerPrevImage = viewerPrevImage;
+window.viewerNextImage = viewerNextImage;
+window.rotatePanorama = rotatePanorama;
+window.resetPanorama = resetPanorama;
+    </script>
+    
+    <style>
+/* 房源详情页专用样式 */
+.property-gallery {
+    margin: -16px -16px 16px -16px;
+    position: relative;
+}
+
+.gallery-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.gallery-action {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.property-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.property-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+}
+
+.property-location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.property-price-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.price-section, .area-section {
+    text-align: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+}
+
+.price-label, .area-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.price-value, .area-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.property-highlights {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.highlight-item i {
+    color: var(--success-color);
+    width: 16px;
+}
+
+.param-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.param-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.param-item:last-child {
+    border-bottom: none;
+}
+
+.param-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.param-value {
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.facilities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.facility-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+}
+
+.facility-item i {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.facility-info {
+    flex: 1;
+}
+
+.facility-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.facility-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.agent-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.agent-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.agent-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.agent-details {
+    flex: 1;
+}
+
+.agent-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.agent-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.agent-phone {
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.view-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    text-align: center;
+}
+
+.stat-item {
+    padding: 16px 8px;
+}
+
+.stat-number {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* 图片轮播样式 */
+.carousel {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+}
+
+.carousel-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.5s ease;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-prev {
+    left: 12px;
+}
+
+.carousel-next {
+    right: 12px;
+}
+
+.carousel-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicator.active {
+    background: white;
+    transform: scale(1.3);
+}
+
+/* 模态框通用样式 */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* 360全景查看器样式 */
+.virtual-tour-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+}
+
+.virtual-tour-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    height: 80vh;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.virtual-tour-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.virtual-tour-viewer {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.panorama-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+
+.panorama-container:active {
+    cursor: grabbing;
+}
+
+.panorama-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.panorama-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+}
+
+.control-btn {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.panorama-hotspots {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.hotspot {
+    position: absolute;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.hotspot-marker {
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+.hotspot-tooltip {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hotspot:hover .hotspot-tooltip {
+    opacity: 1;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* 视频播放器样式 */
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+}
+
+.video-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 800px;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.video-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.video-player {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+}
+
+.video-player video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 图片查看器样式 */
+.image-viewer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+}
+
+.image-viewer-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95vw;
+    height: 90vh;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.image-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.image-viewer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.viewer-main {
+    flex: 1;
+    position: relative;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viewer-main img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.viewer-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.viewer-prev {
+    left: 20px;
+}
+
+.viewer-next {
+    right: 20px;
+}
+
+.viewer-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.viewer-thumbnails {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    overflow-x: auto;
+}
+
+.viewer-thumbnail {
+    width: 80px;
+    height: 60px;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.viewer-thumbnail.active {
+    border-color: var(--primary-color);
+}
+
+.viewer-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .property-highlights {
+        grid-template-columns: 1fr;
+    }
+    
+    .param-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .view-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .virtual-tour-container,
+    .image-viewer-container {
+        width: 95vw;
+        height: 85vh;
+    }
+    
+    .video-container {
+        width: 95vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .property-price-area {
+        grid-template-columns: 1fr;
+    }
+    
+    .agent-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .carousel {
+        height: 200px;
+    }
+    
+    .carousel-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
+/* 固定操作栏样式 */
+.fixed-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.facility-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.facility-item i {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.facility-info {
+    flex: 1;
+}
+
+.facility-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.facility-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.agent-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.agent-avatar img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.agent-details {
+    flex: 1;
+}
+
+.agent-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.agent-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.agent-phone {
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.view-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    text-align: center;
+}
+
+.stat-item {
+    padding: 16px 8px;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.fixed-actions {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    padding: 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 99;
+}
+
+@media (max-width: 576px) {
+    .property-price-area {
+        grid-template-columns: 1fr;
+    }
+    
+    .property-highlights {
+        grid-template-columns: 1fr;
+    }
+    
+    .param-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .view-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .agent-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+    </style>
+</body>
+</html>
